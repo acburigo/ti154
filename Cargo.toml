@@ -1,0 +1,10 @@
+[package]
+name = "ti154"
+version = "0.1.0"
+authors = ["Arthur Crippa Búrigo <arthurcburigo@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+bytes = "0.4.12"
+num-traits = "0.2"
+num-derive = "0.2"
