@@ -290,7 +290,7 @@ impl TryFrom<&mut Cursor<&[u8]>> for DisassociateReason {
     type Error = Error;
     fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
-        FromPrimitive::from_u8(value).ok_or(Error::InvalidAssociationStatus(value))
+        FromPrimitive::from_u8(value).ok_or(Error::InvalidDisassociationReason(value))
     }
 }
 
@@ -349,7 +349,7 @@ impl TryFrom<&mut Cursor<&[u8]>> for MACPIBAttributeId {
     type Error = Error;
     fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
-        FromPrimitive::from_u8(value).ok_or(Error::InvalidAssociationStatus(value))
+        FromPrimitive::from_u8(value).ok_or(Error::InvalidMACPIBAttributeId(value))
     }
 }
 
@@ -386,8 +386,8 @@ pub enum FHPIBAttributeId {
 impl TryFrom<&mut Cursor<&[u8]>> for FHPIBAttributeId {
     type Error = Error;
     fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let value = cursor.get_u8();
-        FromPrimitive::from_u8(value).ok_or(Error::InvalidAssociationStatus(value))
+        let value = cursor.get_u16_le();
+        FromPrimitive::from_u16(value).ok_or(Error::InvalidFHPIBAttributeId(value))
     }
 }
 
@@ -417,6 +417,81 @@ impl TryFrom<&mut Cursor<&[u8]>> for SecurityPIBAttributeId {
     type Error = Error;
     fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
-        FromPrimitive::from_u8(value).ok_or(Error::InvalidAssociationStatus(value))
+        FromPrimitive::from_u8(value).ok_or(Error::InvalidSecurityPIBAttributeId(value))
+    }
+}
+
+#[derive(Debug, FromPrimitive, PartialEq)]
+pub enum ScanType {
+    EnergyDetect = 0x00,
+    Active = 0x01,
+    Passive = 0x02,
+    Orphan = 0x03,
+    Active2 = 0x05,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for ScanType {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let value = cursor.get_u8();
+        FromPrimitive::from_u8(value).ok_or(Error::InvalidScanType(value))
+    }
+}
+
+#[derive(Debug, FromPrimitive, PartialEq)]
+pub enum PhyId {
+    STD_US_915_PHY_1 = 0x01,
+    STD_ETSI_863_PHY_3 = 0x03,
+    MRFSK_GENERIC_PHY_ID_BEGIN = 0x04,
+    MRFSK_GENERIC_PHY_ID_END = 0x06,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for PhyId {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let value = cursor.get_u8();
+        FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
+    }
+}
+
+#[derive(Debug, FromPrimitive, PartialEq)]
+pub enum PermitJoin {
+    AllBeaconRequests = 0x00,
+    OnlyIfPermitJoinIsEnabled = 0x01,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for PermitJoin {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let value = cursor.get_u8();
+        FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
+    }
+}
+
+#[derive(Debug, FromPrimitive, PartialEq)]
+pub enum MPMScan {
+    Disabled = 0x00,
+    Enabled = 0x01,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for MPMScan {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let value = cursor.get_u8();
+        FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
+    }
+}
+
+#[derive(Debug, FromPrimitive, PartialEq)]
+pub enum MPMType {
+    BPAN = 0x01,  // Beacon Enabled
+    NBPAN = 0x02, // Non-beacon Enabled
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for MPMType {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let value = cursor.get_u8();
+        FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
 }
