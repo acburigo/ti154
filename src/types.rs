@@ -583,3 +583,35 @@ impl TryFrom<&mut Cursor<&[u8]>> for ResetReason {
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
 }
+
+#[derive(Debug, FromPrimitive, PartialEq)]
+pub enum SubsystemId {
+    Sys = 0x01,
+    MAC = 0x02,
+    Util = 0x07,
+    AllSubsystems = 0xFF,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for SubsystemId {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let value = cursor.get_u8();
+        FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
+    }
+}
+
+#[derive(Debug, FromPrimitive, PartialEq)]
+pub enum ExtendedAddressType {
+    DEVICE_MAC_PIB = 0x00,
+    DEVICE_PRIMARY = 0x01,
+    DEVICE_USER_CCFG = 0x02,
+    UNKNOWN = 0xFF,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for ExtendedAddressType {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let value = cursor.get_u8();
+        FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
+    }
+}
