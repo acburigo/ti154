@@ -19,6 +19,7 @@ pub enum Error {
     InvalidScanType(u8),
     InvalidPhyId(u8),
     InvalidStatus(u8),
+    InvalidBeaconType(u8),
     NotEnoughBytes,
     NotImplemented,
 }

@@ -1102,3 +1102,744 @@ impl TryFrom<&mut Cursor<&[u8]>> for ScanReqSRSP {
         Ok(ScanReqSRSP { status })
     }
 }
+
+#[derive(Debug)]
+pub struct StartReqSREQ {
+    pub start_time: u32,
+    pub pan_id: u16,
+    pub logical_channel: u8,
+    pub channel_page: u8,
+    pub phy_id: PhyId,
+    pub beacon_order: u8,
+    pub super_frame_order: u8,
+    pub pan_coordinator: bool,
+    pub battery_life_ext: bool,
+    pub coord_realignment: bool,
+    pub realign_key_source: KeySource,
+    pub realign_security_level: SecurityLevel,
+    pub realign_key_id_mode: KeyIdMode,
+    pub realign_key_index: u8,
+    pub beacon_key_source: KeySource,
+    pub beacon_security_level: SecurityLevel,
+    pub beacon_key_id_mode: KeyIdMode,
+    pub beacon_key_index: u8,
+    pub start_fh: bool,
+    pub enh_beacon_order: u8,
+    pub ofs_time_slot: u8,
+    pub non_beacon_order: u16,
+    pub num_ies: u8,
+    pub ie_id_list: Vec<u8>,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for StartReqSREQ {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let start_time = cursor.get_u32_le();
+        let pan_id = cursor.get_u16_le();
+        let logical_channel = cursor.get_u8();
+        let channel_page = cursor.get_u8();
+        let phy_id = PhyId::try_from(Read::by_ref(cursor))?;
+        let beacon_order = cursor.get_u8();
+        let super_frame_order = cursor.get_u8();
+        let pan_coordinator = cursor.get_u8() != 0;
+        let battery_life_ext = cursor.get_u8() != 0;
+        let coord_realignment = cursor.get_u8() != 0;
+        let realign_key_source = KeySource::try_from(Read::by_ref(cursor))?;
+        let realign_security_level = SecurityLevel::try_from(Read::by_ref(cursor))?;
+        let realign_key_id_mode = KeyIdMode::try_from(Read::by_ref(cursor))?;
+        let realign_key_index = cursor.get_u8();
+        let beacon_key_source = KeySource::try_from(Read::by_ref(cursor))?;
+        let beacon_security_level = SecurityLevel::try_from(Read::by_ref(cursor))?;
+        let beacon_key_id_mode = KeyIdMode::try_from(Read::by_ref(cursor))?;
+        let beacon_key_index = cursor.get_u8();
+        let start_fh = cursor.get_u8() != 0;
+        let enh_beacon_order = cursor.get_u8();
+        let ofs_time_slot = cursor.get_u8();
+        let non_beacon_order = cursor.get_u16_le();
+        let num_ies = cursor.get_u8();
+
+        let mut ie_id_list = vec![0x00; num_ies as usize];
+        cursor
+            .read_exact(&mut ie_id_list)
+            .map_err(|_| Error::NotEnoughBytes)?;
+
+        Ok(StartReqSREQ {
+            start_time,
+            pan_id,
+            logical_channel,
+            channel_page,
+            phy_id,
+            beacon_order,
+            super_frame_order,
+            pan_coordinator,
+            battery_life_ext,
+            coord_realignment,
+            realign_key_source,
+            realign_security_level,
+            realign_key_id_mode,
+            realign_key_index,
+            beacon_key_source,
+            beacon_security_level,
+            beacon_key_id_mode,
+            beacon_key_index,
+            start_fh,
+            enh_beacon_order,
+            ofs_time_slot,
+            non_beacon_order,
+            num_ies,
+            ie_id_list,
+        })
+    }
+}
+
+#[derive(Debug)]
+pub struct StartReqSRSP {
+    pub status: Status,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for StartReqSRSP {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_from(Read::by_ref(cursor))?;
+        Ok(StartReqSRSP { status })
+    }
+}
+
+#[derive(Debug)]
+pub struct SyncReqSREQ {
+    pub logical_channel: u8,
+    pub channel_page: u8,
+    pub track_beacon: bool,
+    pub phy_id: PhyId,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for SyncReqSREQ {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let logical_channel = cursor.get_u8();
+        let channel_page = cursor.get_u8();
+        let track_beacon = cursor.get_u8() != 0;
+        let phy_id = PhyId::try_from(Read::by_ref(cursor))?;
+        Ok(SyncReqSREQ {
+            logical_channel,
+            channel_page,
+            track_beacon,
+            phy_id,
+        })
+    }
+}
+
+#[derive(Debug)]
+pub struct SyncReqSRSP {
+    pub status: Status,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for SyncReqSRSP {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_from(Read::by_ref(cursor))?;
+        Ok(SyncReqSRSP { status })
+    }
+}
+
+#[derive(Debug)]
+pub struct SetRxGainReqSREQ {
+    pub mode: bool,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for SetRxGainReqSREQ {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let mode = cursor.get_u8() != 0;
+        Ok(SetRxGainReqSREQ { mode })
+    }
+}
+
+#[derive(Debug)]
+pub struct SetRxGainReqSRSP {
+    pub status: Status,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for SetRxGainReqSRSP {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_from(Read::by_ref(cursor))?;
+        Ok(SetRxGainReqSRSP { status })
+    }
+}
+
+#[derive(Debug)]
+pub struct WSAsyncReqSREQ {
+    pub operation: WiSUNAsyncOperation,
+    pub frame_type: WiSUNAsyncFrameType,
+    pub key_source: KeySource,
+    pub security_level: SecurityLevel,
+    pub key_id_mode: KeyIdMode,
+    pub key_index: u8,
+    pub channels: [u8; 17],
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for WSAsyncReqSREQ {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let operation = WiSUNAsyncOperation::try_from(Read::by_ref(cursor))?;
+        let frame_type = WiSUNAsyncFrameType::try_from(Read::by_ref(cursor))?;
+        let key_source = KeySource::try_from(Read::by_ref(cursor))?;
+        let security_level = SecurityLevel::try_from(Read::by_ref(cursor))?;
+        let key_id_mode = KeyIdMode::try_from(Read::by_ref(cursor))?;
+        let key_index = cursor.get_u8();
+
+        let mut channels: [u8; 17] = Default::default();
+        cursor
+            .read_exact(&mut channels)
+            .map_err(|_| Error::NotEnoughBytes)?;
+        channels.reverse();
+
+        Ok(WSAsyncReqSREQ {
+            operation,
+            frame_type,
+            key_source,
+            security_level,
+            key_id_mode,
+            key_index,
+            channels,
+        })
+    }
+}
+
+#[derive(Debug)]
+pub struct WSAsyncReqSRSP {
+    pub status: Status,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for WSAsyncReqSRSP {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_from(Read::by_ref(cursor))?;
+        Ok(WSAsyncReqSRSP { status })
+    }
+}
+
+#[derive(Debug)]
+pub struct FHEnableReqSREQ {}
+
+impl TryFrom<&mut Cursor<&[u8]>> for FHEnableReqSREQ {
+    type Error = Error;
+    fn try_from(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        Ok(FHEnableReqSREQ {})
+    }
+}
+
+#[derive(Debug)]
+pub struct FHEnableReqSRSP {
+    pub status: Status,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for FHEnableReqSRSP {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_from(Read::by_ref(cursor))?;
+        Ok(FHEnableReqSRSP { status })
+    }
+}
+
+#[derive(Debug)]
+pub struct FHStartReqSREQ {}
+
+impl TryFrom<&mut Cursor<&[u8]>> for FHStartReqSREQ {
+    type Error = Error;
+    fn try_from(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        Ok(FHStartReqSREQ {})
+    }
+}
+
+#[derive(Debug)]
+pub struct FHStartReqSRSP {
+    pub status: Status,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for FHStartReqSRSP {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_from(Read::by_ref(cursor))?;
+        Ok(FHStartReqSRSP { status })
+    }
+}
+
+#[derive(Debug)]
+pub struct FHGetReqSREQ {
+    pub attribute_id: FHPIBAttributeId,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for FHGetReqSREQ {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let attribute_id = FHPIBAttributeId::try_from(Read::by_ref(cursor))?;
+        Ok(FHGetReqSREQ { attribute_id })
+    }
+}
+
+#[derive(Debug)]
+pub struct FHGetReqSRSP {
+    pub status: Status,
+    pub data: Vec<u8>,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for FHGetReqSRSP {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_from(Read::by_ref(cursor))?;
+
+        let mut data = Vec::new();
+        cursor
+            .read_to_end(&mut data)
+            .map_err(|_| Error::NotEnoughBytes)?;
+
+        Ok(FHGetReqSRSP { status, data })
+    }
+}
+
+#[derive(Debug)]
+pub struct FHSetReqSREQ {
+    pub attribute_id: FHPIBAttributeId,
+    pub data: Vec<u8>,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for FHSetReqSREQ {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let attribute_id = FHPIBAttributeId::try_from(Read::by_ref(cursor))?;
+
+        let mut data = Vec::new();
+        cursor
+            .read_to_end(&mut data)
+            .map_err(|_| Error::NotEnoughBytes)?;
+
+        Ok(FHSetReqSREQ { attribute_id, data })
+    }
+}
+
+#[derive(Debug)]
+pub struct FHSetReqSRSP {
+    pub status: Status,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for FHSetReqSRSP {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_from(Read::by_ref(cursor))?;
+        Ok(FHSetReqSRSP { status })
+    }
+}
+
+#[derive(Debug)]
+pub struct SyncLossIndAREQ {
+    pub status: Status,
+    pub pan_id: u16,
+    pub logical_channel: u8,
+    pub channel_page: u8,
+    pub phy_id: PhyId,
+    pub key_source: KeySource,
+    pub security_level: SecurityLevel,
+    pub key_id_mode: KeyIdMode,
+    pub key_index: u8,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for SyncLossIndAREQ {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_from(Read::by_ref(cursor))?;
+        let pan_id = cursor.get_u16_le();
+        let logical_channel = cursor.get_u8();
+        let channel_page = cursor.get_u8();
+        let phy_id = PhyId::try_from(Read::by_ref(cursor))?;
+        let key_source = KeySource::try_from(Read::by_ref(cursor))?;
+        let security_level = SecurityLevel::try_from(Read::by_ref(cursor))?;
+        let key_id_mode = KeyIdMode::try_from(Read::by_ref(cursor))?;
+        let key_index = cursor.get_u8();
+
+        Ok(SyncLossIndAREQ {
+            status,
+            pan_id,
+            logical_channel,
+            channel_page,
+            phy_id,
+            key_source,
+            security_level,
+            key_id_mode,
+            key_index,
+        })
+    }
+}
+
+#[derive(Debug)]
+pub struct AssociateIndAREQ {
+    pub extended_address: ExtendedAddress,
+    pub capabilities: u8,
+    pub key_source: KeySource,
+    pub security_level: SecurityLevel,
+    pub key_id_mode: KeyIdMode,
+    pub key_index: u8,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for AssociateIndAREQ {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let extended_address = ExtendedAddress::try_from(Read::by_ref(cursor))?;
+        let capabilities = cursor.get_u8();
+        let key_source = KeySource::try_from(Read::by_ref(cursor))?;
+        let security_level = SecurityLevel::try_from(Read::by_ref(cursor))?;
+        let key_id_mode = KeyIdMode::try_from(Read::by_ref(cursor))?;
+        let key_index = cursor.get_u8();
+
+        Ok(AssociateIndAREQ {
+            extended_address,
+            capabilities,
+            key_source,
+            security_level,
+            key_id_mode,
+            key_index,
+        })
+    }
+}
+
+#[derive(Debug)]
+pub struct AssociateCnfAREQ {
+    pub status: Status,
+    pub short_address: ShortAddress,
+    pub key_source: KeySource,
+    pub security_level: SecurityLevel,
+    pub key_id_mode: KeyIdMode,
+    pub key_index: u8,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for AssociateCnfAREQ {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_from(Read::by_ref(cursor))?;
+        let short_address = ShortAddress::try_from(Read::by_ref(cursor))?;
+        let key_source = KeySource::try_from(Read::by_ref(cursor))?;
+        let security_level = SecurityLevel::try_from(Read::by_ref(cursor))?;
+        let key_id_mode = KeyIdMode::try_from(Read::by_ref(cursor))?;
+        let key_index = cursor.get_u8();
+
+        Ok(AssociateCnfAREQ {
+            status,
+            short_address,
+            key_source,
+            security_level,
+            key_id_mode,
+            key_index,
+        })
+    }
+}
+
+#[derive(Debug)]
+pub enum BeaconNotifyIndAREQ {
+    StandardFrame(StandardBeaconFrame),
+    EnhancedFrame(EnhancedBeaconFrame),
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for BeaconNotifyIndAREQ {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        use BeaconNotifyIndAREQ::{EnhancedFrame, StandardFrame};
+
+        let beacon_type = cursor.get_u8();
+
+        let beacon_frame = match beacon_type {
+            0 => StandardFrame(StandardBeaconFrame::try_from(Read::by_ref(cursor))?),
+            1 => EnhancedFrame(EnhancedBeaconFrame::try_from(Read::by_ref(cursor))?),
+            _ => return Err(Error::InvalidBeaconType(beacon_type)),
+        };
+
+        Ok(beacon_frame)
+    }
+}
+
+#[derive(Debug)]
+pub struct StandardBeaconFrame {
+    pub bsn: u8,
+    pub timestamp: u32,
+    pub coord_address_mode: AddressMode,
+    pub coord_extended_address: ExtendedAddress,
+    pub pan_id: u16,
+    pub superframe_spec: u16,
+    pub logical_channel: u8,
+    pub channel_page: u8,
+    pub gts_permit: bool,
+    pub link_quality: u8,
+    pub security_failure: bool,
+    pub key_source: KeySource,
+    pub security_level: SecurityLevel,
+    pub key_id_mode: KeyIdMode,
+    pub key_index: u8,
+    pub short_addrs: u8,
+    pub ext_addrs: u8,
+    pub sdu_length: u8,
+    pub short_addr_list: Vec<ShortAddress>,
+    pub ext_addr_list: Vec<ExtendedAddress>,
+    pub nsdu: Vec<u8>,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for StandardBeaconFrame {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let bsn = cursor.get_u8();
+        let timestamp = cursor.get_u32_le();
+        let coord_address_mode = AddressMode::try_from(Read::by_ref(cursor))?;
+        let coord_extended_address = ExtendedAddress::try_from(Read::by_ref(cursor))?;
+        let pan_id = cursor.get_u16_le();
+        let superframe_spec = cursor.get_u16_le();
+        let logical_channel = cursor.get_u8();
+        let channel_page = cursor.get_u8();
+        let gts_permit = cursor.get_u8() != 0;
+        let link_quality = cursor.get_u8();
+        let security_failure = cursor.get_u8() != 0;
+        let key_source = KeySource::try_from(Read::by_ref(cursor))?;
+        let security_level = SecurityLevel::try_from(Read::by_ref(cursor))?;
+        let key_id_mode = KeyIdMode::try_from(Read::by_ref(cursor))?;
+        let key_index = cursor.get_u8();
+        let short_addrs = cursor.get_u8();
+        let ext_addrs = cursor.get_u8();
+        let sdu_length = cursor.get_u8();
+
+        let mut short_addr_list = Vec::new();
+        for _ in 0..short_addrs {
+            short_addr_list.push(ShortAddress::try_from(Read::by_ref(cursor))?);
+        }
+
+        let mut ext_addr_list = Vec::new();
+        for _ in 0..ext_addrs {
+            ext_addr_list.push(ExtendedAddress::try_from(Read::by_ref(cursor))?);
+        }
+
+        let mut nsdu = vec![0x00; sdu_length as usize];
+        cursor
+            .read_exact(&mut nsdu)
+            .map_err(|_| Error::NotEnoughBytes)?;
+
+        Ok(StandardBeaconFrame {
+            bsn,
+            timestamp,
+            coord_address_mode,
+            coord_extended_address,
+            pan_id,
+            superframe_spec,
+            logical_channel,
+            channel_page,
+            gts_permit,
+            link_quality,
+            security_failure,
+            key_source,
+            security_level,
+            key_id_mode,
+            key_index,
+            short_addrs,
+            ext_addrs,
+            sdu_length,
+            short_addr_list,
+            ext_addr_list,
+            nsdu,
+        })
+    }
+}
+
+#[derive(Debug)]
+pub struct EnhancedBeaconFrame {
+    pub bsn: u8,
+    pub beacon_order: u8,
+    pub super_frame_order: u8,
+    pub final_cap_slot: u8,
+    pub enh_beacon_order: u8,
+    pub ofs_time_slot: u8,
+    pub cap_back_off: u8,
+    pub non_beacon_order: u16,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for EnhancedBeaconFrame {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let bsn = cursor.get_u8();
+        let beacon_order = cursor.get_u8();
+        let super_frame_order = cursor.get_u8();
+        let final_cap_slot = cursor.get_u8();
+        let enh_beacon_order = cursor.get_u8();
+        let ofs_time_slot = cursor.get_u8();
+        let cap_back_off = cursor.get_u8();
+        let non_beacon_order = cursor.get_u16_le();
+        Ok(EnhancedBeaconFrame {
+            bsn,
+            beacon_order,
+            super_frame_order,
+            final_cap_slot,
+            enh_beacon_order,
+            ofs_time_slot,
+            cap_back_off,
+            non_beacon_order,
+        })
+    }
+}
+
+#[derive(Debug)]
+pub struct DisassociateIndAREQ {
+    pub extended_address: ExtendedAddress,
+    pub disassociate_reason: DisassociateReason,
+    pub key_source: KeySource,
+    pub security_level: SecurityLevel,
+    pub key_id_mode: KeyIdMode,
+    pub key_index: u8,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for DisassociateIndAREQ {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let extended_address = ExtendedAddress::try_from(Read::by_ref(cursor))?;
+        let disassociate_reason = DisassociateReason::try_from(Read::by_ref(cursor))?;
+        let key_source = KeySource::try_from(Read::by_ref(cursor))?;
+        let security_level = SecurityLevel::try_from(Read::by_ref(cursor))?;
+        let key_id_mode = KeyIdMode::try_from(Read::by_ref(cursor))?;
+        let key_index = cursor.get_u8();
+
+        Ok(DisassociateIndAREQ {
+            extended_address,
+            disassociate_reason,
+            key_source,
+            security_level,
+            key_id_mode,
+            key_index,
+        })
+    }
+}
+
+#[derive(Debug)]
+pub struct DisassociateCnfAREQ {
+    pub status: Status,
+    pub device_addr: Address,
+    pub device_pan_id: u16,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for DisassociateCnfAREQ {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_from(Read::by_ref(cursor))?;
+        let device_addr = Address::try_from(Read::by_ref(cursor))?;
+        let device_pan_id = cursor.get_u16_le();
+
+        Ok(DisassociateCnfAREQ {
+            status,
+            device_addr,
+            device_pan_id,
+        })
+    }
+}
+
+#[derive(Debug)]
+pub struct OrphanIndAREQ {
+    pub extended_address: ExtendedAddress,
+    pub key_source: KeySource,
+    pub security_level: SecurityLevel,
+    pub key_id_mode: KeyIdMode,
+    pub key_index: u8,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for OrphanIndAREQ {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let extended_address = ExtendedAddress::try_from(Read::by_ref(cursor))?;
+        let key_source = KeySource::try_from(Read::by_ref(cursor))?;
+        let security_level = SecurityLevel::try_from(Read::by_ref(cursor))?;
+        let key_id_mode = KeyIdMode::try_from(Read::by_ref(cursor))?;
+        let key_index = cursor.get_u8();
+        Ok(OrphanIndAREQ {
+            extended_address,
+            key_source,
+            security_level,
+            key_id_mode,
+            key_index,
+        })
+    }
+}
+
+#[derive(Debug)]
+pub struct PollCnfAREQ {
+    pub status: Status,
+    pub frame_pending: bool,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for PollCnfAREQ {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_from(Read::by_ref(cursor))?;
+        let frame_pending = cursor.get_u8() != 0;
+        Ok(PollCnfAREQ {
+            status,
+            frame_pending,
+        })
+    }
+}
+
+#[derive(Debug)]
+pub struct PollIndAREQ {
+    pub dev_addr: Address,
+    pub pan_id: u16,
+    pub no_response: bool,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for PollIndAREQ {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let dev_addr = Address::try_from(Read::by_ref(cursor))?;
+        let pan_id = cursor.get_u16_le();
+        let no_response = cursor.get_u8() != 0;
+        Ok(PollIndAREQ {
+            dev_addr,
+            pan_id,
+            no_response,
+        })
+    }
+}
+
+#[derive(Debug)]
+pub struct ScanCnfAREQ {
+    pub status: Status,
+    pub scan_type: ScanType,
+    pub channel_page: u8,
+    pub phy_id: PhyId,
+    pub unscanned_channels: [u8; 17],
+    pub result_list_count: u8,
+    pub result_list: Vec<u8>,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for ScanCnfAREQ {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_from(Read::by_ref(cursor))?;
+        let scan_type = ScanType::try_from(Read::by_ref(cursor))?;
+        let channel_page = cursor.get_u8();
+        let phy_id = PhyId::try_from(Read::by_ref(cursor))?;
+
+        let mut unscanned_channels: [u8; 17] = Default::default();
+        cursor
+            .read_exact(&mut unscanned_channels)
+            .map_err(|_| Error::NotEnoughBytes)?;
+        unscanned_channels.reverse();
+
+        let result_list_count = cursor.get_u8();
+
+        let mut result_list = Vec::new();
+        cursor
+            .read_to_end(&mut result_list)
+            .map_err(|_| Error::NotEnoughBytes)?;
+
+        Ok(ScanCnfAREQ {
+            status,
+            scan_type,
+            channel_page,
+            phy_id,
+            unscanned_channels,
+            result_list_count,
+            result_list,
+        })
+    }
+}

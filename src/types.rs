@@ -495,3 +495,17 @@ impl TryFrom<&mut Cursor<&[u8]>> for MPMType {
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
 }
+
+#[derive(Debug, FromPrimitive, PartialEq)]
+pub enum WiSUNAsyncOperation {
+    Start = 0x00,
+    Stop = 0x01,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for WiSUNAsyncOperation {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let value = cursor.get_u8();
+        FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
+    }
+}
