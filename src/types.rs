@@ -509,3 +509,77 @@ impl TryFrom<&mut Cursor<&[u8]>> for WiSUNAsyncOperation {
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
 }
+
+#[derive(Debug, FromPrimitive, PartialEq)]
+pub enum CommEventReason {
+    AssociateRsp = 0x00, // Event sent in response to MAC_AssociateRsp().
+    OrphanRsp = 0x01,    // Event sent in response to MAC_OrphanRsp().
+    RxSecure = 0x02,     // Event sent as a result of receiving a secure frame.
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for CommEventReason {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let value = cursor.get_u8();
+        FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
+    }
+}
+
+#[derive(Debug, FromPrimitive, PartialEq)]
+pub enum ResetType {
+    Hard = 0,
+    Soft = 1,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for ResetType {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let value = cursor.get_u8();
+        FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
+    }
+}
+
+#[derive(Debug, FromPrimitive, PartialEq)]
+pub enum TransportProtocolRevision {
+    StandardRPCFrame = 2, // Standard RPC frame, no fragmentation
+    ExtendedRPCFrame = 3, // Extended RPC frame, fragmentation
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for TransportProtocolRevision {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let value = cursor.get_u8();
+        FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
+    }
+}
+
+#[derive(Debug, FromPrimitive, PartialEq)]
+pub enum ProductIdCode {
+    ZStack = 0,
+    TI154Stack = 1,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for ProductIdCode {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let value = cursor.get_u8();
+        FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
+    }
+}
+
+#[derive(Debug, FromPrimitive, PartialEq)]
+pub enum ResetReason {
+    Hardware = 0,
+    HostRequest = 1,
+    HALAssert = 2,
+    MACAssert = 3,
+    RTOSAssert = 4,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for ResetReason {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let value = cursor.get_u8();
+        FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
+    }
+}
