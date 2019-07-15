@@ -1843,3 +1843,69 @@ impl TryFrom<&mut Cursor<&[u8]>> for ScanCnfAREQ {
         })
     }
 }
+
+#[derive(Debug)]
+pub struct CommStatusIndAREQ {
+    pub status: Status,
+    pub src_addr: Address,
+    pub dst_addr: Address,
+    pub device_pan_id: u16,
+    pub reason: CommEventReason,
+    pub key_source: KeySource,
+    pub security_level: SecurityLevel,
+    pub key_id_mode: KeyIdMode,
+    pub key_index: u8,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for CommStatusIndAREQ {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_from(Read::by_ref(cursor))?;
+        let src_addr = Address::try_from(Read::by_ref(cursor))?;
+        let dst_addr = Address::try_from(Read::by_ref(cursor))?;
+        let device_pan_id = cursor.get_u16_le();
+        let reason = CommEventReason::try_from(Read::by_ref(cursor))?;
+        let key_source = KeySource::try_from(Read::by_ref(cursor))?;
+        let security_level = SecurityLevel::try_from(Read::by_ref(cursor))?;
+        let key_id_mode = KeyIdMode::try_from(Read::by_ref(cursor))?;
+        let key_index = cursor.get_u8();
+
+        Ok(CommStatusIndAREQ {
+            status,
+            src_addr,
+            dst_addr,
+            device_pan_id,
+            reason,
+            key_source,
+            security_level,
+            key_id_mode,
+            key_index,
+        })
+    }
+}
+
+#[derive(Debug)]
+pub struct StartCnfAREQ {
+    pub status: Status,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for StartCnfAREQ {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_from(Read::by_ref(cursor))?;
+        Ok(StartCnfAREQ { status })
+    }
+}
+
+#[derive(Debug)]
+pub struct WSAsyncCnfAREQ {
+    pub status: Status,
+}
+
+impl TryFrom<&mut Cursor<&[u8]>> for WSAsyncCnfAREQ {
+    type Error = Error;
+    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_from(Read::by_ref(cursor))?;
+        Ok(WSAsyncCnfAREQ { status })
+    }
+}
