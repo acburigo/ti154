@@ -70,7 +70,6 @@ impl Parser {
     }
 
     fn parse_frame(&self) -> Result<MTFrame, Error> {
-        use std::convert::TryFrom;
         let mut cursor = Cursor::new(self.buffer.as_slice());
         MTFrame::try_from(&mut cursor)
     }

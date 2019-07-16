@@ -20,8 +20,6 @@ pub enum MTFramePayload {
     MAC_AssociateInd_AREQ(mac::areq::AssociateInd),
     MAC_AssociateCnf_AREQ(mac::areq::AssociateCnf),
     MAC_BeaconNotifyInd_AREQ(mac::areq::BeaconNotifyInd),
-    MAC_StandardBeaconFrame_AREQ(mac::areq::StandardBeaconFrame),
-    MAC_EnhancedBeaconFrame_AREQ(mac::areq::EnhancedBeaconFrame),
     MAC_DisassociateInd_AREQ(mac::areq::DisassociateInd),
     MAC_DisassociateCnf_AREQ(mac::areq::DisassociateCnf),
     MAC_OrphanInd_AREQ(mac::areq::OrphanInd),
