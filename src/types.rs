@@ -2,7 +2,6 @@ use crate::error::Error;
 use bytes::Buf;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
-use std::convert::TryFrom;
 use std::io::Cursor;
 use std::io::Read;
 
@@ -96,9 +95,8 @@ pub enum Status {
     AutoAckPendingAllOff = 0xFF,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for Status {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl Status {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidStatus(value))
     }
@@ -110,9 +108,8 @@ pub enum AddressMode {
     Addr64Bit = 0x03,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for AddressMode {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl AddressMode {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidAddressMode(value))
     }
@@ -123,9 +120,8 @@ pub struct ShortAddress {
     pub address: [u8; 2],
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for ShortAddress {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl ShortAddress {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let mut address: [u8; 2] = Default::default();
         cursor
             .read_exact(&mut address)
@@ -140,9 +136,8 @@ pub struct ExtendedAddress {
     pub address: [u8; 8],
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for ExtendedAddress {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl ExtendedAddress {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let mut address: [u8; 8] = Default::default();
         cursor
             .read_exact(&mut address)
@@ -158,9 +153,8 @@ pub enum Address {
     Addr64Bit(ExtendedAddress),
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for Address {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl Address {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let address_mode = AddressMode::try_from(Read::by_ref(cursor))?;
         let mut address: [u8; 8] = Default::default();
         cursor
@@ -212,9 +206,8 @@ pub enum TxOption {
     PwrChan = 0x80,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for TxOption {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl TxOption {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidTxOption(value))
     }
@@ -232,9 +225,8 @@ pub enum SecurityLevel {
     AESEncryptionMIC128 = 0x07,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for SecurityLevel {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl SecurityLevel {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidSecurityLevel(value))
     }
@@ -248,9 +240,8 @@ pub enum KeyIdMode {
     Key8ByteIndex = 0x03,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for KeyIdMode {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl KeyIdMode {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidKeyIdMode(value))
     }
@@ -261,9 +252,8 @@ pub struct KeySource {
     pub key: [u8; 8],
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for KeySource {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl KeySource {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let mut key: [u8; 8] = Default::default();
         cursor
             .read_exact(&mut key)
@@ -285,9 +275,8 @@ pub enum WiSUNAsyncFrameType {
     Invalid = 0xFF,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for WiSUNAsyncFrameType {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl WiSUNAsyncFrameType {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidFrameType(value))
     }
@@ -300,9 +289,8 @@ pub enum AssociationStatus {
     PANAccessDenied = 0x02,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for AssociationStatus {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl AssociationStatus {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidAssociationStatus(value))
     }
@@ -315,9 +303,8 @@ pub enum DisassociateReason {
     DevWishesLeave = 0x02,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for DisassociateReason {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl DisassociateReason {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidDisassociationReason(value))
     }
@@ -374,9 +361,8 @@ pub enum MACPIBAttributeId {
     FCSType = 0xE9,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for MACPIBAttributeId {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl MACPIBAttributeId {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidMACPIBAttributeId(value))
     }
@@ -412,9 +398,8 @@ pub enum FHPIBAttributeId {
     NeighborValidTime = 0x2019,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for FHPIBAttributeId {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl FHPIBAttributeId {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u16_le();
         FromPrimitive::from_u16(value).ok_or(Error::InvalidFHPIBAttributeId(value))
     }
@@ -442,9 +427,8 @@ pub enum SecurityPIBAttributeId {
     SecurityLevelEntry = 0xD5,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for SecurityPIBAttributeId {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl SecurityPIBAttributeId {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidSecurityPIBAttributeId(value))
     }
@@ -459,9 +443,8 @@ pub enum ScanType {
     Active2 = 0x05,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for ScanType {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl ScanType {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidScanType(value))
     }
@@ -475,9 +458,8 @@ pub enum PhyId {
     MRFSK_GENERIC_PHY_ID_END = 0x06,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for PhyId {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl PhyId {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
@@ -489,9 +471,8 @@ pub enum PermitJoin {
     OnlyIfPermitJoinIsEnabled = 0x01,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for PermitJoin {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl PermitJoin {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
@@ -503,9 +484,8 @@ pub enum MPMScan {
     Enabled = 0x01,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for MPMScan {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl MPMScan {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
@@ -517,9 +497,8 @@ pub enum MPMType {
     NBPAN = 0x02, // Non-beacon Enabled
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for MPMType {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl MPMType {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
@@ -531,9 +510,8 @@ pub enum WiSUNAsyncOperation {
     Stop = 0x01,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for WiSUNAsyncOperation {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl WiSUNAsyncOperation {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
@@ -546,9 +524,8 @@ pub enum CommEventReason {
     RxSecure = 0x02,     // Event sent as a result of receiving a secure frame.
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for CommEventReason {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl CommEventReason {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
@@ -560,9 +537,8 @@ pub enum ResetType {
     Soft = 1,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for ResetType {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl ResetType {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
@@ -574,9 +550,8 @@ pub enum TransportProtocolRevision {
     ExtendedRPCFrame = 3, // Extended RPC frame, fragmentation
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for TransportProtocolRevision {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl TransportProtocolRevision {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
@@ -588,9 +563,8 @@ pub enum ProductIdCode {
     TI154Stack = 1,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for ProductIdCode {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl ProductIdCode {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
@@ -605,9 +579,8 @@ pub enum ResetReason {
     RTOSAssert = 4,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for ResetReason {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl ResetReason {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
@@ -621,9 +594,8 @@ pub enum SubsystemId {
     AllSubsystems = 0xFF,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for SubsystemId {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl SubsystemId {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
@@ -637,9 +609,8 @@ pub enum ExtendedAddressType {
     UNKNOWN = 0xFF,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for ExtendedAddressType {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl ExtendedAddressType {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }

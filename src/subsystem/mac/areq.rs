@@ -1,7 +1,6 @@
 use crate::error::Error;
 use crate::types::*;
 use bytes::Buf;
-use std::convert::TryFrom;
 use std::io::Cursor;
 use std::io::Read;
 
@@ -18,9 +17,8 @@ pub struct DataCnf {
     pub frame_counter: u32,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for DataCnf {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl DataCnf {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         let handle = cursor.get_u8();
         let timestamp = cursor.get_u32_le();
@@ -68,9 +66,8 @@ pub struct DataInd {
     pub ie_payload: Vec<u8>,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for DataInd {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl DataInd {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let src_address = Address::try_from(Read::by_ref(cursor))?;
         let dest_address = Address::try_from(Read::by_ref(cursor))?;
         let timestamp = cursor.get_u32_le();
@@ -129,9 +126,8 @@ pub struct PurgeCnf {
     pub handle: u8,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for PurgeCnf {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl PurgeCnf {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         let handle = cursor.get_u8();
         Ok(PurgeCnf { status, handle })
@@ -162,9 +158,8 @@ pub struct WSAsyncInd {
     pub ie_payload: Vec<u8>,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for WSAsyncInd {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl WSAsyncInd {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let src_address = Address::try_from(Read::by_ref(cursor))?;
         let dest_address = Address::try_from(Read::by_ref(cursor))?;
         let timestamp = cursor.get_u32_le();
@@ -232,9 +227,8 @@ pub struct SyncLossInd {
     pub key_index: u8,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for SyncLossInd {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl SyncLossInd {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         let pan_id = cursor.get_u16_le();
         let logical_channel = cursor.get_u8();
@@ -269,9 +263,8 @@ pub struct AssociateInd {
     pub key_index: u8,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for AssociateInd {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl AssociateInd {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let extended_address = ExtendedAddress::try_from(Read::by_ref(cursor))?;
         let capabilities = cursor.get_u8();
         let key_source = KeySource::try_from(Read::by_ref(cursor))?;
@@ -300,9 +293,8 @@ pub struct AssociateCnf {
     pub key_index: u8,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for AssociateCnf {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl AssociateCnf {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         let short_address = ShortAddress::try_from(Read::by_ref(cursor))?;
         let key_source = KeySource::try_from(Read::by_ref(cursor))?;
@@ -327,9 +319,8 @@ pub enum BeaconNotifyInd {
     EnhancedFrame(EnhancedBeaconFrame),
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for BeaconNotifyInd {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl BeaconNotifyInd {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         use BeaconNotifyInd::{EnhancedFrame, StandardFrame};
 
         let beacon_type = cursor.get_u8();
@@ -369,9 +360,8 @@ pub struct StandardBeaconFrame {
     pub nsdu: Vec<u8>,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for StandardBeaconFrame {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl StandardBeaconFrame {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let bsn = cursor.get_u8();
         let timestamp = cursor.get_u32_le();
         let coord_address_mode = AddressMode::try_from(Read::by_ref(cursor))?;
@@ -444,9 +434,8 @@ pub struct EnhancedBeaconFrame {
     pub non_beacon_order: u16,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for EnhancedBeaconFrame {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl EnhancedBeaconFrame {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let bsn = cursor.get_u8();
         let beacon_order = cursor.get_u8();
         let super_frame_order = cursor.get_u8();
@@ -478,9 +467,8 @@ pub struct DisassociateInd {
     pub key_index: u8,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for DisassociateInd {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl DisassociateInd {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let extended_address = ExtendedAddress::try_from(Read::by_ref(cursor))?;
         let disassociate_reason = DisassociateReason::try_from(Read::by_ref(cursor))?;
         let key_source = KeySource::try_from(Read::by_ref(cursor))?;
@@ -506,9 +494,8 @@ pub struct DisassociateCnf {
     pub device_pan_id: u16,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for DisassociateCnf {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl DisassociateCnf {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         let device_addr = Address::try_from(Read::by_ref(cursor))?;
         let device_pan_id = cursor.get_u16_le();
@@ -530,9 +517,8 @@ pub struct OrphanInd {
     pub key_index: u8,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for OrphanInd {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl OrphanInd {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let extended_address = ExtendedAddress::try_from(Read::by_ref(cursor))?;
         let key_source = KeySource::try_from(Read::by_ref(cursor))?;
         let security_level = SecurityLevel::try_from(Read::by_ref(cursor))?;
@@ -554,9 +540,8 @@ pub struct PollCnf {
     pub frame_pending: bool,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for PollCnf {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl PollCnf {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         let frame_pending = cursor.get_u8() != 0;
         Ok(PollCnf {
@@ -573,9 +558,8 @@ pub struct PollInd {
     pub no_response: bool,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for PollInd {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl PollInd {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let dev_addr = Address::try_from(Read::by_ref(cursor))?;
         let pan_id = cursor.get_u16_le();
         let no_response = cursor.get_u8() != 0;
@@ -598,9 +582,8 @@ pub struct ScanCnf {
     pub result_list: Vec<u8>,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for ScanCnf {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl ScanCnf {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         let scan_type = ScanType::try_from(Read::by_ref(cursor))?;
         let channel_page = cursor.get_u8();
@@ -644,9 +627,8 @@ pub struct CommStatusInd {
     pub key_index: u8,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for CommStatusInd {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl CommStatusInd {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         let src_addr = Address::try_from(Read::by_ref(cursor))?;
         let dst_addr = Address::try_from(Read::by_ref(cursor))?;
@@ -676,9 +658,8 @@ pub struct StartCnf {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for StartCnf {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl StartCnf {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(StartCnf { status })
     }
@@ -689,9 +670,8 @@ pub struct WSAsyncCnf {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for WSAsyncCnf {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl WSAsyncCnf {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(WSAsyncCnf { status })
     }

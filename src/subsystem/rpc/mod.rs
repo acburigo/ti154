@@ -3,7 +3,6 @@ use crate::frame::CommandCode;
 use bytes::Buf;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
-use std::convert::TryFrom;
 use std::io::Cursor;
 
 #[derive(Debug, FromPrimitive)]
@@ -22,9 +21,8 @@ pub struct MTCommandError {
     pub command: CommandCode,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for MTCommandError {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl MTCommandError {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let error_code = cursor.get_u8();
         let error_code =
             FromPrimitive::from_u8(error_code).ok_or(Error::InvalidErrorCode(error_code))?;

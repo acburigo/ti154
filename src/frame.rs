@@ -3,7 +3,6 @@ use crate::subsystem::{mac, rpc, sys, util};
 use crate::types::{CommandType, MTExtendedHeaderStatus, MTSubsystem};
 use bytes::Buf;
 use num_traits::FromPrimitive;
-use std::convert::TryFrom;
 use std::io::Cursor;
 
 #[derive(Debug)]
@@ -13,9 +12,8 @@ pub struct MTFrame {
     pub payload: MTFramePayload,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for MTFrame {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl MTFrame {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let header = MTHeader::try_from(cursor.by_ref())?;
         let extended_header = if header.has_extension() {
             Some(MTExtendedHeader::try_from(cursor.by_ref())?)
@@ -157,9 +155,8 @@ pub enum MTFramePayload {
     UTIL_Random_SRSP(util::srsp::Random),
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for MTFramePayload {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl MTFramePayload {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         Err(Error::NotImplemented)
     }
 }
@@ -180,9 +177,8 @@ impl MTHeader {
     }
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for MTHeader {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl MTHeader {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let length = cursor.get_u8();
         let command = CommandCode::try_from(cursor)?;
         Ok(MTHeader { length, command })
@@ -197,9 +193,8 @@ pub struct CommandCode {
     pub id: u8,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for CommandCode {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl CommandCode {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let type_and_subsystem = cursor.get_u8();
         let id = cursor.get_u8();
 
@@ -244,9 +239,8 @@ pub enum MTExtendedHeader {
     },
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for MTExtendedHeader {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl MTExtendedHeader {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let version_and_stack_id = cursor.get_u8();
         let version = version_and_stack_id & 0xf8;
         let stack_id = version_and_stack_id & 0x07;

@@ -1,6 +1,5 @@
 use crate::error::Error;
 use bytes::Buf;
-use std::convert::TryFrom;
 use std::io::Cursor;
 use std::io::Read;
 
@@ -11,9 +10,8 @@ pub struct Loopback {
     pub data: Vec<u8>,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for Loopback {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl Loopback {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let repeats = cursor.get_u8();
         let interval = cursor.get_u32_le();
 

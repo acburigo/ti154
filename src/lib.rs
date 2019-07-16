@@ -7,7 +7,6 @@ pub mod types;
 #[cfg(test)]
 mod tests {
     use crate::{frame, types};
-    use std::convert::TryFrom;
     use std::io::Cursor;
 
     #[test]

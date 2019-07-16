@@ -1,16 +1,14 @@
 use crate::error::Error;
 use crate::types::*;
 use bytes::Buf;
-use std::convert::TryFrom;
 use std::io::Cursor;
 use std::io::Read;
 
 #[derive(Debug)]
 pub struct Init {}
 
-impl TryFrom<&mut Cursor<&[u8]>> for Init {
-    type Error = Error;
-    fn try_from(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl Init {
+    pub fn try_from(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         Ok(Init {})
     }
 }
@@ -35,9 +33,8 @@ pub struct DataReq {
     pub ie_payload: Vec<u8>,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for DataReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl DataReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let dest_address = Address::try_from(Read::by_ref(cursor))?;
         let dest_pan_id = cursor.get_u16_le();
         let src_address_mode = AddressMode::try_from(Read::by_ref(cursor))?;
@@ -89,9 +86,8 @@ pub struct PurgeReq {
     pub handle: u8,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for PurgeReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl PurgeReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let handle = cursor.get_u8();
         Ok(PurgeReq { handle })
     }
@@ -111,9 +107,8 @@ pub struct AssociateReq {
     pub key_index: u8,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for AssociateReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl AssociateReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let logical_channel = cursor.get_u8();
         let channel_page = cursor.get_u8();
         let phy_id = cursor.get_u8();
@@ -150,9 +145,8 @@ pub struct AssociateRsp {
     pub key_index: u8,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for AssociateRsp {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl AssociateRsp {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let extended_address = ExtendedAddress::try_from(Read::by_ref(cursor))?;
         let assoc_short_address = ShortAddress::try_from(Read::by_ref(cursor))?;
         let assoc_status = AssociationStatus::try_from(Read::by_ref(cursor))?;
@@ -184,9 +178,8 @@ pub struct DisassociateReq {
     pub key_index: u8,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for DisassociateReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl DisassociateReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let device_address = Address::try_from(Read::by_ref(cursor))?;
         let device_pan_id = cursor.get_u16_le();
         let disassociate_reason = DisassociateReason::try_from(Read::by_ref(cursor))?;
@@ -213,9 +206,8 @@ pub struct GetReq {
     pub attribute_id: MACPIBAttributeId,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for GetReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl GetReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let attribute_id = MACPIBAttributeId::try_from(Read::by_ref(cursor))?;
         Ok(GetReq { attribute_id })
     }
@@ -227,9 +219,8 @@ pub struct SetReq {
     pub attribute_value: [u8; 16],
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for SetReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl SetReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let attribute_id = MACPIBAttributeId::try_from(Read::by_ref(cursor))?;
 
         let mut attribute_value: [u8; 16] = Default::default();
@@ -252,9 +243,8 @@ pub struct SecurityGetReq {
     pub index2: u8,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for SecurityGetReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl SecurityGetReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let attribute_id = SecurityPIBAttributeId::try_from(Read::by_ref(cursor))?;
         let index1 = cursor.get_u8();
         let index2 = cursor.get_u8();
@@ -275,9 +265,8 @@ pub struct SecuritySetReq {
     pub attribute_value: Vec<u8>,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for SecuritySetReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl SecuritySetReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let attribute_id = SecurityPIBAttributeId::try_from(Read::by_ref(cursor))?;
         let index1 = cursor.get_u8();
         let index2 = cursor.get_u8();
@@ -301,9 +290,8 @@ pub struct UpdatePANIdReq {
     pub pan_id: u16,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for UpdatePANIdReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl UpdatePANIdReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let pan_id = cursor.get_u16_le();
         Ok(UpdatePANIdReq { pan_id })
     }
@@ -322,9 +310,8 @@ pub struct AddDeviceReq {
     pub lookup_data: [u8; 9],
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for AddDeviceReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl AddDeviceReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let pan_id = cursor.get_u16_le();
         let short_addr = ShortAddress::try_from(Read::by_ref(cursor))?;
         let ext_addr = ExtendedAddress::try_from(Read::by_ref(cursor))?;
@@ -359,9 +346,8 @@ pub struct DeleteDeviceReq {
     pub ext_addr: ExtendedAddress,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for DeleteDeviceReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl DeleteDeviceReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let ext_addr = ExtendedAddress::try_from(Read::by_ref(cursor))?;
         Ok(DeleteDeviceReq { ext_addr })
     }
@@ -370,9 +356,8 @@ impl TryFrom<&mut Cursor<&[u8]>> for DeleteDeviceReq {
 #[derive(Debug)]
 pub struct DeleteAllDevicesReq {}
 
-impl TryFrom<&mut Cursor<&[u8]>> for DeleteAllDevicesReq {
-    type Error = Error;
-    fn try_from(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl DeleteAllDevicesReq {
+    pub fn try_from(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         Ok(DeleteAllDevicesReq {})
     }
 }
@@ -382,9 +367,8 @@ pub struct DeleteKeyReq {
     pub index: u8,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for DeleteKeyReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl DeleteKeyReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let index = cursor.get_u8();
         Ok(DeleteKeyReq { index })
     }
@@ -395,9 +379,8 @@ pub struct ReadKeyReq {
     pub index: u8,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for ReadKeyReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl ReadKeyReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let index = cursor.get_u8();
         Ok(ReadKeyReq { index })
     }
@@ -413,9 +396,8 @@ pub struct WriteKeyReq {
     pub lookup_data: [u8; 9],
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for WriteKeyReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl WriteKeyReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let new = cursor.get_u8() != 0;
         let index = cursor.get_u16_le();
 
@@ -456,9 +438,8 @@ pub struct OrphanRsp {
     pub key_index: u8,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for OrphanRsp {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl OrphanRsp {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let extended_address = ExtendedAddress::try_from(Read::by_ref(cursor))?;
         let assoc_short_address = ShortAddress::try_from(Read::by_ref(cursor))?;
         let associated_member = cursor.get_u8() != 0;
@@ -488,9 +469,8 @@ pub struct PollReq {
     pub key_index: u8,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for PollReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl PollReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let coord_address = Address::try_from(Read::by_ref(cursor))?;
         let coord_pan_id = cursor.get_u16_le();
         let key_source = KeySource::try_from(Read::by_ref(cursor))?;
@@ -513,9 +493,8 @@ pub struct ResetReq {
     pub set_default: bool,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for ResetReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl ResetReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let set_default = cursor.get_u8() != 0;
         Ok(ResetReq { set_default })
     }
@@ -541,9 +520,8 @@ pub struct ScanReq {
     pub channels: [u8; 17],
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for ScanReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl ScanReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let scan_type = ScanType::try_from(Read::by_ref(cursor))?;
         let scan_duration = cursor.get_u8();
         let channel_page = cursor.get_u8();
@@ -615,9 +593,8 @@ pub struct StartReq {
     pub ie_id_list: Vec<u8>,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for StartReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl StartReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let start_time = cursor.get_u32_le();
         let pan_id = cursor.get_u16_le();
         let logical_channel = cursor.get_u8();
@@ -684,9 +661,8 @@ pub struct SyncReq {
     pub phy_id: PhyId,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for SyncReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl SyncReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let logical_channel = cursor.get_u8();
         let channel_page = cursor.get_u8();
         let track_beacon = cursor.get_u8() != 0;
@@ -705,9 +681,8 @@ pub struct SetRxGainReq {
     pub mode: bool,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for SetRxGainReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl SetRxGainReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let mode = cursor.get_u8() != 0;
         Ok(SetRxGainReq { mode })
     }
@@ -724,9 +699,8 @@ pub struct WSAsyncReq {
     pub channels: [u8; 17],
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for WSAsyncReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl WSAsyncReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let operation = WiSUNAsyncOperation::try_from(Read::by_ref(cursor))?;
         let frame_type = WiSUNAsyncFrameType::try_from(Read::by_ref(cursor))?;
         let key_source = KeySource::try_from(Read::by_ref(cursor))?;
@@ -755,9 +729,8 @@ impl TryFrom<&mut Cursor<&[u8]>> for WSAsyncReq {
 #[derive(Debug)]
 pub struct FHEnableReq {}
 
-impl TryFrom<&mut Cursor<&[u8]>> for FHEnableReq {
-    type Error = Error;
-    fn try_from(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl FHEnableReq {
+    pub fn try_from(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         Ok(FHEnableReq {})
     }
 }
@@ -765,9 +738,8 @@ impl TryFrom<&mut Cursor<&[u8]>> for FHEnableReq {
 #[derive(Debug)]
 pub struct FHStartReq {}
 
-impl TryFrom<&mut Cursor<&[u8]>> for FHStartReq {
-    type Error = Error;
-    fn try_from(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl FHStartReq {
+    pub fn try_from(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         Ok(FHStartReq {})
     }
 }
@@ -777,9 +749,8 @@ pub struct FHGetReq {
     pub attribute_id: FHPIBAttributeId,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for FHGetReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl FHGetReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let attribute_id = FHPIBAttributeId::try_from(Read::by_ref(cursor))?;
         Ok(FHGetReq { attribute_id })
     }
@@ -791,9 +762,8 @@ pub struct FHSetReq {
     pub data: Vec<u8>,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for FHSetReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl FHSetReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let attribute_id = FHPIBAttributeId::try_from(Read::by_ref(cursor))?;
 
         let mut data = Vec::new();

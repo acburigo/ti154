@@ -1,7 +1,6 @@
 use crate::error::Error;
 use crate::types::*;
 use bytes::Buf;
-use std::convert::TryFrom;
 use std::io::Cursor;
 use std::io::Read;
 
@@ -10,9 +9,8 @@ pub struct ResetReq {
     pub reset_type: ResetType,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for ResetReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl ResetReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let reset_type = ResetType::try_from(Read::by_ref(cursor))?;
         Ok(ResetReq { reset_type })
     }
@@ -28,9 +26,8 @@ pub struct ResetInd {
     pub maint: u8,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for ResetInd {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl ResetInd {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let reason = ResetReason::try_from(Read::by_ref(cursor))?;
         let transport = TransportProtocolRevision::try_from(Read::by_ref(cursor))?;
         let product = ProductIdCode::try_from(Read::by_ref(cursor))?;

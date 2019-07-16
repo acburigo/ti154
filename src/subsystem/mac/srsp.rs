@@ -1,7 +1,6 @@
 use crate::error::Error;
 use crate::types::*;
 use bytes::Buf;
-use std::convert::TryFrom;
 use std::io::Cursor;
 use std::io::Read;
 
@@ -10,9 +9,8 @@ pub struct Init {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for Init {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl Init {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(Init { status })
     }
@@ -23,9 +21,8 @@ pub struct DataReq {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for DataReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl DataReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(DataReq { status })
     }
@@ -36,9 +33,8 @@ pub struct PurgeReq {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for PurgeReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl PurgeReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(PurgeReq { status })
     }
@@ -49,9 +45,8 @@ pub struct AssociateReq {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for AssociateReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl AssociateReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(AssociateReq { status })
     }
@@ -62,9 +57,8 @@ pub struct AssociateRsp {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for AssociateRsp {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl AssociateRsp {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(AssociateRsp { status })
     }
@@ -75,9 +69,8 @@ pub struct DisassociateReq {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for DisassociateReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl DisassociateReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(DisassociateReq { status })
     }
@@ -89,9 +82,8 @@ pub struct GetReq {
     pub data: [u8; 16],
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for GetReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl GetReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
 
         let mut data: [u8; 16] = Default::default();
@@ -109,9 +101,8 @@ pub struct SetReq {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for SetReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl SetReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(SetReq { status })
     }
@@ -125,9 +116,8 @@ pub struct SecurityGetReq {
     pub data: Vec<u8>,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for SecurityGetReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl SecurityGetReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         let index1 = cursor.get_u8();
         let index2 = cursor.get_u8();
@@ -151,9 +141,8 @@ pub struct SecuritySetReq {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for SecuritySetReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl SecuritySetReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(SecuritySetReq { status })
     }
@@ -164,9 +153,8 @@ pub struct UpdatePANIdReq {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for UpdatePANIdReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl UpdatePANIdReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(UpdatePANIdReq { status })
     }
@@ -177,9 +165,8 @@ pub struct AddDeviceReq {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for AddDeviceReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl AddDeviceReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(AddDeviceReq { status })
     }
@@ -190,9 +177,8 @@ pub struct DeleteDeviceReq {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for DeleteDeviceReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl DeleteDeviceReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(DeleteDeviceReq { status })
     }
@@ -203,9 +189,8 @@ pub struct DeleteAllDevicesReq {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for DeleteAllDevicesReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl DeleteAllDevicesReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(DeleteAllDevicesReq { status })
     }
@@ -216,9 +201,8 @@ pub struct DeleteKeyReq {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for DeleteKeyReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl DeleteKeyReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(DeleteKeyReq { status })
     }
@@ -230,9 +214,8 @@ pub struct ReadKeyReq {
     pub frame_counter: u32,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for ReadKeyReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl ReadKeyReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         let frame_counter = cursor.get_u32_le();
         Ok(ReadKeyReq {
@@ -247,9 +230,8 @@ pub struct WriteKeyReq {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for WriteKeyReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl WriteKeyReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(WriteKeyReq { status })
     }
@@ -260,9 +242,8 @@ pub struct OrphanRsp {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for OrphanRsp {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl OrphanRsp {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(OrphanRsp { status })
     }
@@ -273,9 +254,8 @@ pub struct PollReq {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for PollReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl PollReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(PollReq { status })
     }
@@ -286,9 +266,8 @@ pub struct ResetReq {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for ResetReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl ResetReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(ResetReq { status })
     }
@@ -299,9 +278,8 @@ pub struct ScanReq {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for ScanReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl ScanReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(ScanReq { status })
     }
@@ -312,9 +290,8 @@ pub struct StartReq {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for StartReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl StartReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(StartReq { status })
     }
@@ -325,9 +302,8 @@ pub struct SyncReq {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for SyncReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl SyncReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(SyncReq { status })
     }
@@ -338,9 +314,8 @@ pub struct SetRxGainReq {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for SetRxGainReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl SetRxGainReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(SetRxGainReq { status })
     }
@@ -351,9 +326,8 @@ pub struct WSAsyncReq {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for WSAsyncReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl WSAsyncReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(WSAsyncReq { status })
     }
@@ -364,9 +338,8 @@ pub struct FHEnableReq {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for FHEnableReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl FHEnableReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(FHEnableReq { status })
     }
@@ -377,9 +350,8 @@ pub struct FHStartReq {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for FHStartReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl FHStartReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(FHStartReq { status })
     }
@@ -391,9 +363,8 @@ pub struct FHGetReq {
     pub data: Vec<u8>,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for FHGetReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl FHGetReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
 
         let mut data = Vec::new();
@@ -410,9 +381,8 @@ pub struct FHSetReq {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for FHSetReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl FHSetReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(FHSetReq { status })
     }

@@ -1,15 +1,13 @@
 use crate::error::Error;
 use bytes::Buf;
-use std::convert::TryFrom;
 use std::io::Cursor;
 use std::io::Read;
 
 #[derive(Debug)]
 pub struct PingReq {}
 
-impl TryFrom<&mut Cursor<&[u8]>> for PingReq {
-    type Error = Error;
-    fn try_from(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl PingReq {
+    pub fn try_from(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         Ok(PingReq {})
     }
 }
@@ -17,9 +15,8 @@ impl TryFrom<&mut Cursor<&[u8]>> for PingReq {
 #[derive(Debug)]
 pub struct VersionReq {}
 
-impl TryFrom<&mut Cursor<&[u8]>> for VersionReq {
-    type Error = Error;
-    fn try_from(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl VersionReq {
+    pub fn try_from(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         Ok(VersionReq {})
     }
 }
@@ -32,9 +29,8 @@ pub struct NVCreateReq {
     pub length: u32,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for NVCreateReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl NVCreateReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let sys_id = cursor.get_u8();
         let item_id = cursor.get_u16_le();
         let sub_id = cursor.get_u16_le();
@@ -55,9 +51,8 @@ pub struct NVDeleteReq {
     pub sub_id: u16,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for NVDeleteReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl NVDeleteReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let sys_id = cursor.get_u8();
         let item_id = cursor.get_u16_le();
         let sub_id = cursor.get_u16_le();
@@ -76,9 +71,8 @@ pub struct NVLengthReq {
     pub sub_id: u16,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for NVLengthReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl NVLengthReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let sys_id = cursor.get_u8();
         let item_id = cursor.get_u16_le();
         let sub_id = cursor.get_u16_le();
@@ -99,9 +93,8 @@ pub struct NVReadReq {
     pub length: u8,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for NVReadReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl NVReadReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let sys_id = cursor.get_u8();
         let item_id = cursor.get_u16_le();
         let sub_id = cursor.get_u16_le();
@@ -127,9 +120,8 @@ pub struct NVWriteReq {
     pub data: Vec<u8>,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for NVWriteReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl NVWriteReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let sys_id = cursor.get_u8();
         let item_id = cursor.get_u16_le();
         let sub_id = cursor.get_u16_le();
@@ -161,9 +153,8 @@ pub struct NVUpdateReq {
     pub data: Vec<u8>,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for NVUpdateReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl NVUpdateReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let sys_id = cursor.get_u8();
         let item_id = cursor.get_u16_le();
         let sub_id = cursor.get_u16_le();
@@ -189,9 +180,8 @@ pub struct NVCompactReq {
     pub threshold: u16,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for NVCompactReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl NVCompactReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let threshold = cursor.get_u16_le();
         Ok(NVCompactReq { threshold })
     }

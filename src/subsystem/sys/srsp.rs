@@ -1,7 +1,6 @@
 use crate::error::Error;
 use crate::types::*;
 use bytes::Buf;
-use std::convert::TryFrom;
 use std::io::Cursor;
 use std::io::Read;
 
@@ -10,9 +9,8 @@ pub struct PingReq {
     pub capabilities: u16,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for PingReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl PingReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let capabilities = cursor.get_u16_le();
         Ok(PingReq { capabilities })
     }
@@ -27,9 +25,8 @@ pub struct VersionReq {
     pub maint: u8,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for VersionReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl VersionReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let transport = TransportProtocolRevision::try_from(Read::by_ref(cursor))?;
         let product = ProductIdCode::try_from(Read::by_ref(cursor))?;
         let major = cursor.get_u8();
@@ -50,9 +47,8 @@ pub struct NVCreateReq {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for NVCreateReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl NVCreateReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(NVCreateReq { status })
     }
@@ -63,9 +59,8 @@ pub struct NVDeleteReq {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for NVDeleteReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl NVDeleteReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(NVDeleteReq { status })
     }
@@ -76,9 +71,8 @@ pub struct NVLengthReq {
     pub length: u32,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for NVLengthReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl NVLengthReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let length = cursor.get_u32_le();
         Ok(NVLengthReq { length })
     }
@@ -91,9 +85,8 @@ pub struct NVReadReq {
     pub data: Vec<u8>,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for NVReadReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl NVReadReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         let length = cursor.get_u8();
 
@@ -115,9 +108,8 @@ pub struct NVWriteReq {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for NVWriteReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl NVWriteReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(NVWriteReq { status })
     }
@@ -128,9 +120,8 @@ pub struct NVUpdateReq {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for NVUpdateReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl NVUpdateReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(NVUpdateReq { status })
     }
@@ -141,9 +132,8 @@ pub struct NVCompactReq {
     pub status: Status,
 }
 
-impl TryFrom<&mut Cursor<&[u8]>> for NVCompactReq {
-    type Error = Error;
-    fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+impl NVCompactReq {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(NVCompactReq { status })
     }
