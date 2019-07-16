@@ -1,9 +1,31 @@
 use crate::error::Error;
-use crate::frame::CommandCode;
+use crate::frame::{MTHeader, MTExtendedHeader, CommandCode};
+use crate::subsystem::MTFramePayload;
+use crate::types::CommandType;
 use bytes::Buf;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 use std::io::Cursor;
+
+pub fn try_from(
+    header: &MTHeader,
+    _: &Option<MTExtendedHeader>,
+    cursor: &mut Cursor<&[u8]>,
+) -> Result<MTFramePayload, Error> {
+    use MTFramePayload::*;
+
+    match header.command.cmd_type {
+        CommandType::POLL => Err(Error::NotImplemented),
+        CommandType::SREQ => Err(Error::NotImplemented),
+        CommandType::AREQ => Err(Error::NotImplemented),
+        CommandType::SRSP => {
+            match header.command.id {
+                0x00 => Ok(RPC_MTCommandError(MTCommandError::try_from(cursor)?)),
+                _ => Err(Error::NotImplemented),
+            }
+        }
+    }
+}
 
 #[derive(Debug, FromPrimitive)]
 pub enum ErrorCode {
