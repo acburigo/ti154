@@ -450,6 +450,7 @@ impl ScanType {
     }
 }
 
+#[allow(non_camel_case_types)]
 #[derive(Debug, FromPrimitive, PartialEq)]
 pub enum PhyId {
     STD_US_915_PHY_1 = 0x01,
@@ -601,6 +602,7 @@ impl SubsystemId {
     }
 }
 
+#[allow(non_camel_case_types)]
 #[derive(Debug, FromPrimitive, PartialEq)]
 pub enum ExtendedAddressType {
     DEVICE_MAC_PIB = 0x00,
