@@ -19,7 +19,7 @@ pub fn try_from(
         CommandType::SREQ => Err(Error::NotImplemented),
         CommandType::AREQ => Err(Error::NotImplemented),
         CommandType::SRSP => match header.command.id {
-            0x00 => Ok(RPC_MTCommandError(MTCommandError::try_from(cursor)?)),
+            0x00 => MTCommandError::try_from(cursor).map(|x| RPC_MTCommandError(x)),
             _ => Err(Error::NotImplemented),
         },
     }

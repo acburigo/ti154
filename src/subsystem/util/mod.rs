@@ -18,25 +18,21 @@ pub fn try_from(
     match header.command.cmd_type {
         CommandType::POLL => Err(Error::NotImplemented),
         CommandType::SREQ => match header.command.id {
-            0x06 => Ok(UTIL_CallbackSubCmd_SREQ(sreq::CallbackSubCmd::try_from(
-                cursor,
-            )?)),
-            0xee => Ok(UTIL_GetExtAddr_SREQ(sreq::GetExtAddr::try_from(cursor)?)),
-            0x10 => Ok(UTIL_Loopback_SREQ(sreq::Loopback::try_from(cursor)?)),
-            0x12 => Ok(UTIL_Random_SREQ(sreq::Random::try_from(cursor)?)),
+            0x06 => sreq::CallbackSubCmd::try_from(cursor).map(|x| UTIL_CallbackSubCmd_SREQ(x)),
+            0xee => sreq::GetExtAddr::try_from(cursor).map(|x| UTIL_GetExtAddr_SREQ(x)),
+            0x10 => sreq::Loopback::try_from(cursor).map(|x| UTIL_Loopback_SREQ(x)),
+            0x12 => sreq::Random::try_from(cursor).map(|x| UTIL_Random_SREQ(x)),
             _ => Err(Error::NotImplemented),
         },
         CommandType::AREQ => match header.command.id {
-            0x10 => Ok(UTIL_Loopback_AREQ(areq::Loopback::try_from(cursor)?)),
+            0x10 => areq::Loopback::try_from(cursor).map(|x| UTIL_Loopback_AREQ(x)),
             _ => Err(Error::NotImplemented),
         },
         CommandType::SRSP => match header.command.id {
-            0x06 => Ok(UTIL_CallbackSubCmd_SRSP(srsp::CallbackSubCmd::try_from(
-                cursor,
-            )?)),
-            0xee => Ok(UTIL_GetExtAddr_SRSP(srsp::GetExtAddr::try_from(cursor)?)),
-            0x10 => Ok(UTIL_Loopback_SRSP(srsp::Loopback::try_from(cursor)?)),
-            0x12 => Ok(UTIL_Random_SRSP(srsp::Random::try_from(cursor)?)),
+            0x06 => srsp::CallbackSubCmd::try_from(cursor).map(|x| UTIL_CallbackSubCmd_SRSP(x)),
+            0xee => srsp::GetExtAddr::try_from(cursor).map(|x| UTIL_GetExtAddr_SRSP(x)),
+            0x10 => srsp::Loopback::try_from(cursor).map(|x| UTIL_Loopback_SRSP(x)),
+            0x12 => srsp::Random::try_from(cursor).map(|x| UTIL_Random_SRSP(x)),
             _ => Err(Error::NotImplemented),
         },
     }
