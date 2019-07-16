@@ -56,4 +56,23 @@ mod tests {
             panic!("Incorrect payload type.");
         }
     }
+
+    #[test]
+    fn parse_mac_reset_req_srsp() {
+        let data = [0x1, 0x62, 0x1, 0x0];
+        let mut cursor = Cursor::new(&data[..]);
+        let frame = frame::MTFrame::try_from(&mut cursor).unwrap();
+        assert_eq!(frame.header.length, 0x01);
+        assert_eq!(frame.header.has_extension(), false);
+        assert_eq!(frame.header.command.cmd_type, types::CommandType::SRSP);
+        assert_eq!(frame.header.command.subsystem, types::MTSubsystem::MAC);
+        assert_eq!(frame.header.command.id, 0x01);
+        assert!(frame.extended_header.is_none());
+
+        if let subsystem::MTFramePayload::MAC_ResetReq_SRSP(ref payload) = frame.payload {
+            assert_eq!(payload.status, types::Status::Success);
+        } else {
+            panic!("Incorrect payload type.");
+        }
+    }
 }
