@@ -6,7 +6,7 @@ pub mod types;
 
 #[cfg(test)]
 mod tests {
-    use crate::{frame, types};
+    use crate::{frame, subsystem, types};
     use std::io::Cursor;
 
     #[test]
@@ -44,6 +44,16 @@ mod tests {
         assert_eq!(frame.header.command.subsystem, types::MTSubsystem::SYS);
         assert_eq!(frame.header.command.id, 0x80);
         assert!(frame.extended_header.is_none());
-        println!("{:#?}", frame);
+
+        if let subsystem::MTFramePayload::SYS_ResetInd_AREQ(ref payload) = frame.payload {
+            assert_eq!(payload.reason, types::ResetReason::Hardware);
+            assert_eq!(payload.transport, types::TransportProtocolRevision::ExtendedRPCFrame);
+            assert_eq!(payload.product, types::ProductIdCode::TI154Stack);
+            assert_eq!(payload.major, 0x02);
+            assert_eq!(payload.minor, 0x02);
+            assert_eq!(payload.maint, 0x00);
+        } else {
+            panic!("Incorrect payload type.");
+        }
     }
 }
