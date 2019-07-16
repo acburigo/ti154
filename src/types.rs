@@ -7,6 +7,35 @@ use std::io::Cursor;
 use std::io::Read;
 
 #[derive(Debug, FromPrimitive, PartialEq)]
+pub enum CommandType {
+    POLL = 0,
+    SREQ = 1,
+    AREQ = 2,
+    SRSP = 3,
+}
+
+#[derive(Debug, FromPrimitive, PartialEq)]
+pub enum MTExtendedHeaderStatus {
+    Success = 0,                           // Success
+    ResendLastFrame = 1,                   // Request - resend last frame
+    UnsupportedStackId = 2,                // Unsupported Stack ID
+    BlockOutOfOrder = 3,                   // Block out of order – fragmentation aborted
+    BlockLengthChanged = 4,                // Block length changed – fragmentation aborted
+    MemoryAllocationError = 5,             // Memory allocation error – fragmentation aborted
+    FragmentationSequenceCompleted = 6,    // Fragmentation sequence completed
+    FragmentationSequenceAborted = 7,      // Fragmentation sequence aborted
+    UnsupportedFragmentationAckStatus = 8, // Unsupported Fragmentation Ack Status
+}
+
+#[derive(Debug, FromPrimitive, PartialEq)]
+pub enum MTSubsystem {
+    RPC = 0,
+    SYS = 1,
+    MAC = 2,
+    UTIL = 7,
+}
+
+#[derive(Debug, FromPrimitive, PartialEq)]
 pub enum Status {
     Success = 0x00,
     Unsupported = 0x18,

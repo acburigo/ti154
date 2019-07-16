@@ -6,7 +6,7 @@ pub mod types;
 
 #[cfg(test)]
 mod tests {
-    use crate::{frame, subsystem};
+    use crate::{frame, types};
     use std::convert::TryFrom;
     use std::io::Cursor;
 
@@ -17,8 +17,8 @@ mod tests {
         let header = frame::MTHeader::try_from(&mut cursor).unwrap();
         assert_eq!(header.length, 0);
         assert_eq!(header.has_extension(), false);
-        assert_eq!(header.command.cmd_type, frame::CommandType::POLL);
-        assert_eq!(header.command.subsystem, subsystem::MTSubsystem::SYS);
+        assert_eq!(header.command.cmd_type, types::CommandType::POLL);
+        assert_eq!(header.command.subsystem, types::MTSubsystem::SYS);
         assert_eq!(header.command.id, 2);
     }
 
@@ -29,8 +29,8 @@ mod tests {
         let header = frame::MTHeader::try_from(&mut cursor).unwrap();
         assert_eq!(header.length, 255);
         assert_eq!(header.has_extension(), true);
-        assert_eq!(header.command.cmd_type, frame::CommandType::POLL);
-        assert_eq!(header.command.subsystem, subsystem::MTSubsystem::SYS);
+        assert_eq!(header.command.cmd_type, types::CommandType::POLL);
+        assert_eq!(header.command.subsystem, types::MTSubsystem::SYS);
         assert_eq!(header.command.id, 10);
     }
 
@@ -41,8 +41,8 @@ mod tests {
         let frame = frame::MTFrame::try_from(&mut cursor).unwrap();
         assert_eq!(frame.header.length, 0x06);
         assert_eq!(frame.header.has_extension(), false);
-        assert_eq!(frame.header.command.cmd_type, frame::CommandType::AREQ);
-        assert_eq!(frame.header.command.subsystem, subsystem::MTSubsystem::SYS);
+        assert_eq!(frame.header.command.cmd_type, types::CommandType::AREQ);
+        assert_eq!(frame.header.command.subsystem, types::MTSubsystem::SYS);
         assert_eq!(frame.header.command.id, 0x80);
         assert!(frame.extended_header.is_none());
         println!("{:#?}", frame);

@@ -1,31 +1,10 @@
 use crate::error::Error;
-use crate::subsystem::{MTSubsystem, mac, rpc, sys, util};
+use crate::subsystem::{mac, rpc, sys, util};
+use crate::types::{CommandType, MTExtendedHeaderStatus, MTSubsystem};
 use bytes::Buf;
-use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 use std::convert::TryFrom;
 use std::io::Cursor;
-
-#[derive(Debug, FromPrimitive, PartialEq)]
-pub enum CommandType {
-    POLL = 0,
-    SREQ = 1,
-    AREQ = 2,
-    SRSP = 3,
-}
-
-#[derive(Debug, FromPrimitive, PartialEq)]
-pub enum MTExtendedHeaderStatus {
-    Success = 0,                           // Success
-    ResendLastFrame = 1,                   // Request - resend last frame
-    UnsupportedStackId = 2,                // Unsupported Stack ID
-    BlockOutOfOrder = 3,                   // Block out of order – fragmentation aborted
-    BlockLengthChanged = 4,                // Block length changed – fragmentation aborted
-    MemoryAllocationError = 5,             // Memory allocation error – fragmentation aborted
-    FragmentationSequenceCompleted = 6,    // Fragmentation sequence completed
-    FragmentationSequenceAborted = 7,      // Fragmentation sequence aborted
-    UnsupportedFragmentationAckStatus = 8, // Unsupported Fragmentation Ack Status
-}
 
 #[derive(Debug)]
 pub struct MTFrame {
