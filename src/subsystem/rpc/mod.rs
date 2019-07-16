@@ -16,6 +16,7 @@ pub enum ErrorCode {
     MemoryAllocationFailure = 0x06,
 }
 
+#[derive(Debug)]
 pub struct MTCommandError {
     pub error_code: ErrorCode,
     pub command: CommandCode,
