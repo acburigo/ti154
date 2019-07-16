@@ -4,7 +4,7 @@ pub mod sys;
 pub mod util;
 
 use crate::error::Error;
-use crate::frame::{MTHeader, MTExtendedHeader};
+use crate::frame::{MTExtendedHeader, MTHeader};
 use crate::types::MTSubsystem;
 use std::io::Cursor;
 

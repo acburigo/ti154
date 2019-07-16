@@ -1,5 +1,5 @@
 use crate::error::Error;
-use crate::frame::{MTHeader, MTExtendedHeader, CommandCode};
+use crate::frame::{CommandCode, MTExtendedHeader, MTHeader};
 use crate::subsystem::MTFramePayload;
 use crate::types::CommandType;
 use bytes::Buf;
@@ -18,12 +18,10 @@ pub fn try_from(
         CommandType::POLL => Err(Error::NotImplemented),
         CommandType::SREQ => Err(Error::NotImplemented),
         CommandType::AREQ => Err(Error::NotImplemented),
-        CommandType::SRSP => {
-            match header.command.id {
-                0x00 => Ok(RPC_MTCommandError(MTCommandError::try_from(cursor)?)),
-                _ => Err(Error::NotImplemented),
-            }
-        }
+        CommandType::SRSP => match header.command.id {
+            0x00 => Ok(RPC_MTCommandError(MTCommandError::try_from(cursor)?)),
+            _ => Err(Error::NotImplemented),
+        },
     }
 }
 
