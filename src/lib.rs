@@ -33,4 +33,18 @@ mod tests {
         assert_eq!(header.command.subsystem, subsystem::MTSubsystem::SYS);
         assert_eq!(header.command.id, 10);
     }
+
+    #[test]
+    fn parse_sys_reset_ind() {
+        let data = [0x6, 0x41, 0x80, 0x0, 0x3, 0x1, 0x2, 0x2, 0x0];
+        let mut cursor = Cursor::new(&data[..]);
+        let frame = frame::MTFrame::try_from(&mut cursor).unwrap();
+        assert_eq!(frame.header.length, 0x06);
+        assert_eq!(frame.header.has_extension(), false);
+        assert_eq!(frame.header.command.cmd_type, frame::CommandType::AREQ);
+        assert_eq!(frame.header.command.subsystem, subsystem::MTSubsystem::SYS);
+        assert_eq!(frame.header.command.id, 0x80);
+        assert!(frame.extended_header.is_none());
+        println!("{:#?}", frame);
+    }
 }
