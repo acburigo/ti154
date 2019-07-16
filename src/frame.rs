@@ -113,7 +113,7 @@ pub enum MTExtendedHeader {
 impl MTExtendedHeader {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let version_and_stack_id = cursor.get_u8();
-        let version = version_and_stack_id & 0xf8;
+        let version = (version_and_stack_id & 0xf8) >> 3;
         let stack_id = version_and_stack_id & 0x07;
 
         if version == 1 {
