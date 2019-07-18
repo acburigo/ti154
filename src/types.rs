@@ -752,3 +752,24 @@ impl ChannelsBitMap {
         buffer.extend(self.channels.iter().rev());
     }
 }
+
+#[derive(Debug, FromPrimitive, Copy, Clone)]
+pub enum ErrorCode {
+    InvalidSubsystem = 0x01,
+    InvalidCommandId = 0x02,
+    InvalidParameter = 0x03,
+    InvalidLength = 0x04,
+    UnsupportedExtendedHeaderType = 0x05,
+    MemoryAllocationFailure = 0x06,
+}
+
+impl ErrorCode {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let value = cursor.get_u8();
+        FromPrimitive::from_u8(value).ok_or(Error::InvalidErrorCode(value))
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(*self as u8);
+    }
+}

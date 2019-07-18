@@ -86,6 +86,10 @@ impl CommandCode {
             id,
         })
     }
+
+    pub fn try_into(&self, _buffer: &mut Vec<u8>) {
+        panic!("TODO");
+    }
 }
 
 #[derive(Debug)]
