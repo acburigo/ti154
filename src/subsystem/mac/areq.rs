@@ -1,6 +1,6 @@
 use crate::error::Error;
 use crate::types::*;
-use bytes::Buf;
+use bytes::{Buf, BufMut};
 use std::io::Cursor;
 use std::io::Read;
 
@@ -40,6 +40,18 @@ impl DataCnf {
             rssi,
             frame_counter,
         })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
+        buffer.put_u8(self.handle);
+        buffer.put_u32_le(self.timestamp);
+        buffer.put_u16_le(self.timestamp2);
+        buffer.put_u8(self.retries);
+        buffer.put_u8(self.link_quality);
+        buffer.put_u8(self.correlation);
+        buffer.put_u8(self.rssi);
+        buffer.put_u32_le(self.frame_counter);
     }
 }
 
@@ -118,6 +130,28 @@ impl DataInd {
             ie_payload,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.src_address.try_into(buffer);
+        self.dest_address.try_into(buffer);
+        buffer.put_u32_le(self.timestamp);
+        buffer.put_u16_le(self.timestamp2);
+        buffer.put_u16_le(self.src_pan_id);
+        buffer.put_u16_le(self.dest_pan_id);
+        buffer.put_u8(self.link_quality);
+        buffer.put_u8(self.correlation);
+        buffer.put_u8(self.rssi);
+        buffer.put_u8(self.dsn);
+        self.key_source.try_into(buffer);
+        self.security_level.try_into(buffer);
+        self.key_id_mode.try_into(buffer);
+        buffer.put_u8(self.key_index);
+        buffer.put_u32_le(self.frame_counter);
+        buffer.put_u16_le(self.data_length);
+        buffer.put_u16_le(self.ie_length);
+        buffer.extend(self.data_payload.iter());
+        buffer.extend(self.ie_payload.iter());
+    }
 }
 
 #[derive(Debug)]
@@ -131,6 +165,11 @@ impl PurgeCnf {
         let status = Status::try_from(Read::by_ref(cursor))?;
         let handle = cursor.get_u8();
         Ok(PurgeCnf { status, handle })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
+        buffer.put_u8(self.handle);
     }
 }
 
@@ -212,6 +251,29 @@ impl WSAsyncInd {
             ie_payload,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.src_address.try_into(buffer);
+        self.dest_address.try_into(buffer);
+        buffer.put_u32_le(self.timestamp);
+        buffer.put_u16_le(self.timestamp2);
+        buffer.put_u16_le(self.src_pan_id);
+        buffer.put_u16_le(self.dest_pan_id);
+        buffer.put_u8(self.link_quality);
+        buffer.put_u8(self.correlation);
+        buffer.put_u8(self.rssi);
+        buffer.put_u8(self.dsn);
+        self.key_source.try_into(buffer);
+        self.security_level.try_into(buffer);
+        self.key_id_mode.try_into(buffer);
+        buffer.put_u8(self.key_index);
+        buffer.put_u32_le(self.frame_counter);
+        self.frame_type.try_into(buffer);
+        buffer.put_u16_le(self.data_length);
+        buffer.put_u16_le(self.ie_length);
+        buffer.extend(self.data_payload.iter());
+        buffer.extend(self.ie_payload.iter());
+    }
 }
 
 #[derive(Debug)]
@@ -251,6 +313,18 @@ impl SyncLossInd {
             key_index,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
+        buffer.put_u16_le(self.pan_id);
+        buffer.put_u8(self.logical_channel);
+        buffer.put_u8(self.channel_page);
+        self.phy_id.try_into(buffer);
+        self.key_source.try_into(buffer);
+        self.security_level.try_into(buffer);
+        self.key_id_mode.try_into(buffer);
+        buffer.put_u8(self.key_index);
+    }
 }
 
 #[derive(Debug)]
@@ -280,6 +354,15 @@ impl AssociateInd {
             key_id_mode,
             key_index,
         })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.extended_address.try_into(buffer);
+        buffer.put_u8(self.capabilities);
+        self.key_source.try_into(buffer);
+        self.security_level.try_into(buffer);
+        self.key_id_mode.try_into(buffer);
+        buffer.put_u8(self.key_index);
     }
 }
 
@@ -311,6 +394,15 @@ impl AssociateCnf {
             key_index,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
+        self.short_address.try_into(buffer);
+        self.key_source.try_into(buffer);
+        self.security_level.try_into(buffer);
+        self.key_id_mode.try_into(buffer);
+        buffer.put_u8(self.key_index);
+    }
 }
 
 #[derive(Debug)]
@@ -332,6 +424,19 @@ impl BeaconNotifyInd {
         };
 
         Ok(beacon_frame)
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        match self {
+            BeaconNotifyInd::StandardFrame(frame) => {
+                buffer.put_u8(0);
+                frame.try_into(buffer);
+            }
+            BeaconNotifyInd::EnhancedFrame(frame) => {
+                buffer.put_u8(1);
+                frame.try_into(buffer);
+            }
+        }
     }
 }
 
@@ -420,6 +525,37 @@ impl StandardBeaconFrame {
             nsdu,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(self.bsn);
+        buffer.put_u32_le(self.timestamp);
+        self.coord_address_mode.try_into(buffer);
+        self.coord_extended_address.try_into(buffer);
+        buffer.put_u16_le(self.pan_id);
+        buffer.put_u16_le(self.superframe_spec);
+        buffer.put_u8(self.logical_channel);
+        buffer.put_u8(self.channel_page);
+        buffer.put_u8(if self.gts_permit { 1 } else { 0 });
+        buffer.put_u8(self.link_quality);
+        buffer.put_u8(if self.security_failure { 1 } else { 0 });
+        self.key_source.try_into(buffer);
+        self.security_level.try_into(buffer);
+        self.key_id_mode.try_into(buffer);
+        buffer.put_u8(self.key_index);
+        buffer.put_u8(self.short_addrs);
+        buffer.put_u8(self.ext_addrs);
+        buffer.put_u8(self.sdu_length);
+
+        for short_address in self.short_addr_list.iter() {
+            short_address.try_into(buffer);
+        }
+
+        for extended_address in self.ext_addr_list.iter() {
+            extended_address.try_into(buffer);
+        }
+
+        buffer.extend(self.nsdu.iter());
+    }
 }
 
 #[derive(Debug)]
@@ -455,6 +591,17 @@ impl EnhancedBeaconFrame {
             non_beacon_order,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(self.bsn);
+        buffer.put_u8(self.beacon_order);
+        buffer.put_u8(self.super_frame_order);
+        buffer.put_u8(self.final_cap_slot);
+        buffer.put_u8(self.enh_beacon_order);
+        buffer.put_u8(self.ofs_time_slot);
+        buffer.put_u8(self.cap_back_off);
+        buffer.put_u16_le(self.non_beacon_order);
+    }
 }
 
 #[derive(Debug)]
@@ -485,6 +632,15 @@ impl DisassociateInd {
             key_index,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.extended_address.try_into(buffer);
+        self.disassociate_reason.try_into(buffer);
+        self.key_source.try_into(buffer);
+        self.security_level.try_into(buffer);
+        self.key_id_mode.try_into(buffer);
+        buffer.put_u8(self.key_index);
+    }
 }
 
 #[derive(Debug)]
@@ -505,6 +661,12 @@ impl DisassociateCnf {
             device_addr,
             device_pan_id,
         })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
+        self.device_addr.try_into(buffer);
+        buffer.put_u16_le(self.device_pan_id);
     }
 }
 
@@ -532,6 +694,14 @@ impl OrphanInd {
             key_index,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.extended_address.try_into(buffer);
+        self.key_source.try_into(buffer);
+        self.security_level.try_into(buffer);
+        self.key_id_mode.try_into(buffer);
+        buffer.put_u8(self.key_index);
+    }
 }
 
 #[derive(Debug)]
@@ -548,6 +718,11 @@ impl PollCnf {
             status,
             frame_pending,
         })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
+        buffer.put_u8(if self.frame_pending { 1 } else { 0 });
     }
 }
 
@@ -568,6 +743,12 @@ impl PollInd {
             pan_id,
             no_response,
         })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.dev_addr.try_into(buffer);
+        buffer.put_u16_le(self.pan_id);
+        buffer.put_u8(if self.no_response { 1 } else { 0 });
     }
 }
 
@@ -612,6 +793,16 @@ impl ScanCnf {
             result_list,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
+        self.scan_type.try_into(buffer);
+        buffer.put_u8(self.channel_page);
+        self.phy_id.try_into(buffer);
+        buffer.extend(self.unscanned_channels.iter().rev());
+        buffer.put_u8(self.result_list_count);
+        buffer.extend(self.result_list.iter());
+    }
 }
 
 #[derive(Debug)]
@@ -651,6 +842,18 @@ impl CommStatusInd {
             key_index,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
+        self.src_addr.try_into(buffer);
+        self.dst_addr.try_into(buffer);
+        buffer.put_u16_le(self.device_pan_id);
+        self.reason.try_into(buffer);
+        self.key_source.try_into(buffer);
+        self.security_level.try_into(buffer);
+        self.key_id_mode.try_into(buffer);
+        buffer.put_u8(self.key_index);
+    }
 }
 
 #[derive(Debug)]
@@ -663,6 +866,10 @@ impl StartCnf {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(StartCnf { status })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
+    }
 }
 
 #[derive(Debug)]
@@ -674,5 +881,9 @@ impl WSAsyncCnf {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(WSAsyncCnf { status })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
     }
 }
