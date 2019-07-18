@@ -1,6 +1,6 @@
 use crate::error::Error;
 use crate::types::*;
-use bytes::Buf;
+use bytes::{Buf, BufMut};
 use std::io::Cursor;
 use std::io::Read;
 
@@ -14,6 +14,10 @@ impl Init {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(Init { status })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
+    }
 }
 
 #[derive(Debug)]
@@ -25,6 +29,10 @@ impl DataReq {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(DataReq { status })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
     }
 }
 
@@ -38,6 +46,10 @@ impl PurgeReq {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(PurgeReq { status })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
+    }
 }
 
 #[derive(Debug)]
@@ -49,6 +61,10 @@ impl AssociateReq {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(AssociateReq { status })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
     }
 }
 
@@ -62,6 +78,10 @@ impl AssociateRsp {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(AssociateRsp { status })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
+    }
 }
 
 #[derive(Debug)]
@@ -73,6 +93,10 @@ impl DisassociateReq {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(DisassociateReq { status })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
     }
 }
 
@@ -94,6 +118,11 @@ impl GetReq {
 
         Ok(GetReq { status, data })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
+        buffer.extend(self.data.iter().rev());
+    }
 }
 
 #[derive(Debug)]
@@ -105,6 +134,10 @@ impl SetReq {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(SetReq { status })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
     }
 }
 
@@ -134,6 +167,13 @@ impl SecurityGetReq {
             data,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
+        buffer.put_u8(self.index1);
+        buffer.put_u8(self.index2);
+        buffer.extend(self.data.iter());
+    }
 }
 
 #[derive(Debug)]
@@ -145,6 +185,10 @@ impl SecuritySetReq {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(SecuritySetReq { status })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
     }
 }
 
@@ -158,6 +202,10 @@ impl UpdatePANIdReq {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(UpdatePANIdReq { status })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
+    }
 }
 
 #[derive(Debug)]
@@ -169,6 +217,10 @@ impl AddDeviceReq {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(AddDeviceReq { status })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
     }
 }
 
@@ -182,6 +234,10 @@ impl DeleteDeviceReq {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(DeleteDeviceReq { status })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
+    }
 }
 
 #[derive(Debug)]
@@ -194,6 +250,10 @@ impl DeleteAllDevicesReq {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(DeleteAllDevicesReq { status })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
+    }
 }
 
 #[derive(Debug)]
@@ -205,6 +265,10 @@ impl DeleteKeyReq {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(DeleteKeyReq { status })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
     }
 }
 
@@ -223,6 +287,11 @@ impl ReadKeyReq {
             frame_counter,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
+        buffer.put_u32_le(self.frame_counter);
+    }
 }
 
 #[derive(Debug)]
@@ -234,6 +303,10 @@ impl WriteKeyReq {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(WriteKeyReq { status })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
     }
 }
 
@@ -247,6 +320,10 @@ impl OrphanRsp {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(OrphanRsp { status })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
+    }
 }
 
 #[derive(Debug)]
@@ -258,6 +335,10 @@ impl PollReq {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(PollReq { status })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
     }
 }
 
@@ -271,6 +352,10 @@ impl ResetReq {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(ResetReq { status })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
+    }
 }
 
 #[derive(Debug)]
@@ -282,6 +367,10 @@ impl ScanReq {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(ScanReq { status })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
     }
 }
 
@@ -295,6 +384,10 @@ impl StartReq {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(StartReq { status })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
+    }
 }
 
 #[derive(Debug)]
@@ -306,6 +399,10 @@ impl SyncReq {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(SyncReq { status })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
     }
 }
 
@@ -319,6 +416,10 @@ impl SetRxGainReq {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(SetRxGainReq { status })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
+    }
 }
 
 #[derive(Debug)]
@@ -330,6 +431,10 @@ impl WSAsyncReq {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(WSAsyncReq { status })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
     }
 }
 
@@ -343,6 +448,10 @@ impl FHEnableReq {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(FHEnableReq { status })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
+    }
 }
 
 #[derive(Debug)]
@@ -354,6 +463,10 @@ impl FHStartReq {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(FHStartReq { status })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
     }
 }
 
@@ -374,6 +487,11 @@ impl FHGetReq {
 
         Ok(FHGetReq { status, data })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
+        buffer.extend(self.data.iter());
+    }
 }
 
 #[derive(Debug)]
@@ -385,5 +503,9 @@ impl FHSetReq {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(FHSetReq { status })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
     }
 }
