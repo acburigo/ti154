@@ -732,3 +732,23 @@ impl ExtendedAddressType {
         buffer.put_u8(*self as u8);
     }
 }
+
+#[derive(Debug, PartialEq)]
+pub struct ChannelsBitMap {
+    pub channels: [u8; 17],
+}
+
+impl ChannelsBitMap {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let mut channels: [u8; 17] = Default::default();
+        cursor
+            .read_exact(&mut channels)
+            .map_err(|_| Error::NotEnoughBytes)?;
+        channels.reverse();
+        Ok(ChannelsBitMap { channels })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.extend(self.channels.iter().rev());
+    }
+}

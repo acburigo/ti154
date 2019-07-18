@@ -517,7 +517,7 @@ pub struct ScanReq {
     pub security_level: SecurityLevel,
     pub key_id_mode: KeyIdMode,
     pub key_index: u8,
-    pub channels: [u8; 17],
+    pub channels: ChannelsBitMap,
 }
 
 impl ScanReq {
@@ -537,13 +537,7 @@ impl ScanReq {
         let security_level = SecurityLevel::try_from(Read::by_ref(cursor))?;
         let key_id_mode = KeyIdMode::try_from(Read::by_ref(cursor))?;
         let key_index = cursor.get_u8();
-
-        let mut channels: [u8; 17] = Default::default();
-        cursor
-            .read_exact(&mut channels)
-            .map_err(|_| Error::NotEnoughBytes)?;
-        channels.reverse();
-
+        let channels = ChannelsBitMap::try_from(Read::by_ref(cursor))?;
         Ok(ScanReq {
             scan_type,
             scan_duration,
@@ -696,7 +690,7 @@ pub struct WSAsyncReq {
     pub security_level: SecurityLevel,
     pub key_id_mode: KeyIdMode,
     pub key_index: u8,
-    pub channels: [u8; 17],
+    pub channels: ChannelsBitMap,
 }
 
 impl WSAsyncReq {
@@ -707,13 +701,7 @@ impl WSAsyncReq {
         let security_level = SecurityLevel::try_from(Read::by_ref(cursor))?;
         let key_id_mode = KeyIdMode::try_from(Read::by_ref(cursor))?;
         let key_index = cursor.get_u8();
-
-        let mut channels: [u8; 17] = Default::default();
-        cursor
-            .read_exact(&mut channels)
-            .map_err(|_| Error::NotEnoughBytes)?;
-        channels.reverse();
-
+        let channels = ChannelsBitMap::try_from(Read::by_ref(cursor))?;
         Ok(WSAsyncReq {
             operation,
             frame_type,

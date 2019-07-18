@@ -758,7 +758,7 @@ pub struct ScanCnf {
     pub scan_type: ScanType,
     pub channel_page: u8,
     pub phy_id: PhyId,
-    pub unscanned_channels: [u8; 17],
+    pub unscanned_channels: ChannelsBitMap,
     pub result_list_count: u8,
     pub result_list: Vec<u8>,
 }
@@ -769,13 +769,7 @@ impl ScanCnf {
         let scan_type = ScanType::try_from(Read::by_ref(cursor))?;
         let channel_page = cursor.get_u8();
         let phy_id = PhyId::try_from(Read::by_ref(cursor))?;
-
-        let mut unscanned_channels: [u8; 17] = Default::default();
-        cursor
-            .read_exact(&mut unscanned_channels)
-            .map_err(|_| Error::NotEnoughBytes)?;
-        unscanned_channels.reverse();
-
+        let unscanned_channels = ChannelsBitMap::try_from(Read::by_ref(cursor))?;
         let result_list_count = cursor.get_u8();
 
         let mut result_list = Vec::new();
@@ -799,7 +793,7 @@ impl ScanCnf {
         self.scan_type.try_into(buffer);
         buffer.put_u8(self.channel_page);
         self.phy_id.try_into(buffer);
-        buffer.extend(self.unscanned_channels.iter().rev());
+        self.unscanned_channels.try_into(buffer);
         buffer.put_u8(self.result_list_count);
         buffer.extend(self.result_list.iter());
     }
