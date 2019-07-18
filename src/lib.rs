@@ -47,7 +47,10 @@ mod tests {
 
         if let subsystem::MTFramePayload::SYS_ResetInd_AREQ(ref payload) = frame.payload {
             assert_eq!(payload.reason, types::ResetReason::Hardware);
-            assert_eq!(payload.transport, types::TransportProtocolRevision::ExtendedRPCFrame);
+            assert_eq!(
+                payload.transport,
+                types::TransportProtocolRevision::ExtendedRPCFrame
+            );
             assert_eq!(payload.product, types::ProductIdCode::TI154Stack);
             assert_eq!(payload.major, 0x02);
             assert_eq!(payload.minor, 0x02);
