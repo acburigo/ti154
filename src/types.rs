@@ -1,5 +1,5 @@
 use crate::error::Error;
-use bytes::Buf;
+use bytes::{Buf, BufMut};
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 use std::io::Cursor;
@@ -34,7 +34,7 @@ pub enum MTSubsystem {
     UTIL = 7,
 }
 
-#[derive(Debug, FromPrimitive, PartialEq)]
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
 pub enum Status {
     Success = 0x00,
     Unsupported = 0x18,
@@ -100,9 +100,13 @@ impl Status {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidStatus(value))
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(*self as u8);
+    }
 }
 
-#[derive(Debug, FromPrimitive, PartialEq)]
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
 pub enum AddressMode {
     Addr16Bit = 0x02,
     Addr64Bit = 0x03,
@@ -113,21 +117,24 @@ impl AddressMode {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidAddressMode(value))
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(*self as u8);
+    }
 }
 
 #[derive(Debug, PartialEq)]
 pub struct ShortAddress {
-    pub address: [u8; 2],
+    pub address: u16,
 }
 
 impl ShortAddress {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let mut address: [u8; 2] = Default::default();
-        cursor
-            .read_exact(&mut address)
-            .map_err(|_| Error::NotEnoughBytes)?;
-        address.reverse();
-        Ok(ShortAddress { address })
+        Ok(ShortAddress { address: cursor.get_u16_le() })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u16_le(self.address);
     }
 }
 
@@ -145,6 +152,10 @@ impl ExtendedAddress {
         address.reverse();
         Ok(ExtendedAddress { address })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.extend(self.address.iter().rev());
+    }
 }
 
 #[derive(Debug, PartialEq)]
@@ -156,24 +167,36 @@ pub enum Address {
 impl Address {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let address_mode = AddressMode::try_from(Read::by_ref(cursor))?;
-        let mut address: [u8; 8] = Default::default();
-        cursor
-            .read_exact(&mut address)
-            .map_err(|_| Error::NotEnoughBytes)?;
-        address.reverse();
 
         let address = match address_mode {
-            AddressMode::Addr16Bit => Address::Addr16Bit(ShortAddress {
-                address: [address[6], address[7]],
-            }),
-            AddressMode::Addr64Bit => Address::Addr64Bit(ExtendedAddress { address }),
+            AddressMode::Addr16Bit => {
+                let address = Address::Addr16Bit(ShortAddress::try_from(cursor)?);
+                std::io::BufRead::consume(cursor, 6);
+                address
+            }
+            AddressMode::Addr64Bit => {
+                Address::Addr64Bit(ExtendedAddress::try_from(cursor)?)
+            }
         };
 
         Ok(address)
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        match self {
+            Address::Addr16Bit(address) => {
+                buffer.put_u8(AddressMode::Addr16Bit as u8);
+                address.try_into(buffer);
+            }
+            Address::Addr64Bit(address) => {
+                buffer.put_u8(AddressMode::Addr64Bit as u8);
+                address.try_into(buffer);
+            }
+        }
+    }
 }
 
-#[derive(Debug, FromPrimitive, PartialEq)]
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
 pub enum TxOption {
     // Non-acknowledged transmission.
     NoAck = 0x00,
@@ -211,9 +234,13 @@ impl TxOption {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidTxOption(value))
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(*self as u8);
+    }
 }
 
-#[derive(Debug, FromPrimitive, PartialEq)]
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
 pub enum SecurityLevel {
     NoSecurity = 0x00,
     MIC32Auth = 0x01,
@@ -230,9 +257,13 @@ impl SecurityLevel {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidSecurityLevel(value))
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(*self as u8);
+    }
 }
 
-#[derive(Debug, FromPrimitive, PartialEq)]
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
 pub enum KeyIdMode {
     NotUsed = 0x00,
     Key1ByteIndex = 0x01,
@@ -244,6 +275,10 @@ impl KeyIdMode {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidKeyIdMode(value))
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(*self as u8);
     }
 }
 
@@ -261,9 +296,13 @@ impl KeySource {
         key.reverse();
         Ok(KeySource { key })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.extend(self.key.iter().rev());
+    }
 }
 
-#[derive(Debug, FromPrimitive, PartialEq)]
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
 pub enum WiSUNAsyncFrameType {
     PANAdvert = 0x00,
     PANAdvertSOL = 0x01,
@@ -280,9 +319,13 @@ impl WiSUNAsyncFrameType {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidFrameType(value))
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(*self as u8);
+    }
 }
 
-#[derive(Debug, FromPrimitive, PartialEq)]
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
 pub enum AssociationStatus {
     Successful = 0x00,
     PANAtCapacity = 0x01,
@@ -294,9 +337,13 @@ impl AssociationStatus {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidAssociationStatus(value))
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(*self as u8);
+    }
 }
 
-#[derive(Debug, FromPrimitive, PartialEq)]
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
 pub enum DisassociateReason {
     Reserved = 0x00,
     CoorWishesDevLeave = 0x01,
@@ -308,9 +355,13 @@ impl DisassociateReason {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidDisassociationReason(value))
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(*self as u8);
+    }
 }
 
-#[derive(Debug, FromPrimitive, PartialEq)]
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
 pub enum MACPIBAttributeId {
     AckWaitDuration = 0x40,
     AssociationPermit = 0x41,
@@ -366,9 +417,13 @@ impl MACPIBAttributeId {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidMACPIBAttributeId(value))
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(*self as u8);
+    }
 }
 
-#[derive(Debug, FromPrimitive, PartialEq)]
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
 pub enum FHPIBAttributeId {
     TrackParentEUI = 0x2000,
     BCInterval = 0x2001,
@@ -403,9 +458,13 @@ impl FHPIBAttributeId {
         let value = cursor.get_u16_le();
         FromPrimitive::from_u16(value).ok_or(Error::InvalidFHPIBAttributeId(value))
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u16_le(*self as u16);
+    }
 }
 
-#[derive(Debug, FromPrimitive, PartialEq)]
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
 pub enum SecurityPIBAttributeId {
     KeyTable = 0x71,
     KeyTableEntries = 0x81,
@@ -432,9 +491,13 @@ impl SecurityPIBAttributeId {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidSecurityPIBAttributeId(value))
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(*self as u8);
+    }
 }
 
-#[derive(Debug, FromPrimitive, PartialEq)]
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
 pub enum ScanType {
     EnergyDetect = 0x00,
     Active = 0x01,
@@ -448,10 +511,14 @@ impl ScanType {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidScanType(value))
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(*self as u8);
+    }
 }
 
 #[allow(non_camel_case_types)]
-#[derive(Debug, FromPrimitive, PartialEq)]
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
 pub enum PhyId {
     STD_US_915_PHY_1 = 0x01,
     STD_ETSI_863_PHY_3 = 0x03,
@@ -464,9 +531,13 @@ impl PhyId {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(*self as u8);
+    }
 }
 
-#[derive(Debug, FromPrimitive, PartialEq)]
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
 pub enum PermitJoin {
     AllBeaconRequests = 0x00,
     OnlyIfPermitJoinIsEnabled = 0x01,
@@ -477,9 +548,13 @@ impl PermitJoin {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(*self as u8);
+    }
 }
 
-#[derive(Debug, FromPrimitive, PartialEq)]
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
 pub enum MPMScan {
     Disabled = 0x00,
     Enabled = 0x01,
@@ -490,9 +565,13 @@ impl MPMScan {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(*self as u8);
+    }
 }
 
-#[derive(Debug, FromPrimitive, PartialEq)]
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
 pub enum MPMType {
     BPAN = 0x01,  // Beacon Enabled
     NBPAN = 0x02, // Non-beacon Enabled
@@ -503,9 +582,13 @@ impl MPMType {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(*self as u8);
+    }
 }
 
-#[derive(Debug, FromPrimitive, PartialEq)]
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
 pub enum WiSUNAsyncOperation {
     Start = 0x00,
     Stop = 0x01,
@@ -516,9 +599,13 @@ impl WiSUNAsyncOperation {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(*self as u8);
+    }
 }
 
-#[derive(Debug, FromPrimitive, PartialEq)]
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
 pub enum CommEventReason {
     AssociateRsp = 0x00, // Event sent in response to MAC_AssociateRsp().
     OrphanRsp = 0x01,    // Event sent in response to MAC_OrphanRsp().
@@ -530,9 +617,13 @@ impl CommEventReason {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(*self as u8);
+    }
 }
 
-#[derive(Debug, FromPrimitive, PartialEq)]
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
 pub enum ResetType {
     Hard = 0,
     Soft = 1,
@@ -543,9 +634,13 @@ impl ResetType {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(*self as u8);
+    }
 }
 
-#[derive(Debug, FromPrimitive, PartialEq)]
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
 pub enum TransportProtocolRevision {
     StandardRPCFrame = 2, // Standard RPC frame, no fragmentation
     ExtendedRPCFrame = 3, // Extended RPC frame, fragmentation
@@ -556,9 +651,13 @@ impl TransportProtocolRevision {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(*self as u8);
+    }
 }
 
-#[derive(Debug, FromPrimitive, PartialEq)]
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
 pub enum ProductIdCode {
     ZStack = 0,
     TI154Stack = 1,
@@ -569,9 +668,13 @@ impl ProductIdCode {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(*self as u8);
+    }
 }
 
-#[derive(Debug, FromPrimitive, PartialEq)]
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
 pub enum ResetReason {
     Hardware = 0,
     HostRequest = 1,
@@ -585,9 +688,13 @@ impl ResetReason {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(*self as u8);
+    }
 }
 
-#[derive(Debug, FromPrimitive, PartialEq)]
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
 pub enum SubsystemId {
     Sys = 0x01,
     MAC = 0x02,
@@ -600,10 +707,14 @@ impl SubsystemId {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(*self as u8);
+    }
 }
 
 #[allow(non_camel_case_types)]
-#[derive(Debug, FromPrimitive, PartialEq)]
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
 pub enum ExtendedAddressType {
     DEVICE_MAC_PIB = 0x00,
     DEVICE_PRIMARY = 0x01,
@@ -615,5 +726,9 @@ impl ExtendedAddressType {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(*self as u8);
     }
 }
