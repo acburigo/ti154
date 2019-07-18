@@ -1,6 +1,6 @@
 use crate::error::Error;
 use crate::types::*;
-use bytes::Buf;
+use bytes::{Buf, BufMut};
 use std::io::Cursor;
 use std::io::Read;
 
@@ -11,6 +11,8 @@ impl Init {
     pub fn try_from(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         Ok(Init {})
     }
+
+    pub fn try_into(&self, _: &mut Vec<u8>) {}
 }
 
 #[derive(Debug)]
@@ -79,6 +81,25 @@ impl DataReq {
             ie_payload,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.dest_address.try_into(buffer);
+        buffer.put_u16_le(self.dest_pan_id);
+        self.src_address_mode.try_into(buffer);
+        buffer.put_u8(self.handle);
+        self.tx_option.try_into(buffer);
+        buffer.put_u8(self.channel);
+        buffer.put_u8(self.power);
+        self.key_source.try_into(buffer);
+        self.security_level.try_into(buffer);
+        self.key_id_mode.try_into(buffer);
+        buffer.put_u8(self.key_index);
+        buffer.put_u32_le(self.include_fh_ies);
+        buffer.put_u16_le(self.data_length);
+        buffer.put_u16_le(self.ie_length);
+        buffer.extend(self.data_payload.iter());
+        buffer.extend(self.ie_payload.iter());
+    }
 }
 
 #[derive(Debug)]
@@ -90,6 +111,10 @@ impl PurgeReq {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let handle = cursor.get_u8();
         Ok(PurgeReq { handle })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(self.handle);
     }
 }
 
@@ -132,6 +157,19 @@ impl AssociateReq {
             key_index,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(self.logical_channel);
+        buffer.put_u8(self.channel_page);
+        buffer.put_u8(self.phy_id);
+        self.coord_address.try_into(buffer);
+        buffer.put_u16_le(self.coord_pan_id);
+        buffer.put_u8(self.capability_info);
+        self.key_source.try_into(buffer);
+        self.security_level.try_into(buffer);
+        self.key_id_mode.try_into(buffer);
+        buffer.put_u8(self.key_index);
+    }
 }
 
 #[derive(Debug)]
@@ -163,6 +201,16 @@ impl AssociateRsp {
             key_id_mode,
             key_index,
         })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.extended_address.try_into(buffer);
+        self.assoc_short_address.try_into(buffer);
+        self.assoc_status.try_into(buffer);
+        self.key_source.try_into(buffer);
+        self.security_level.try_into(buffer);
+        self.key_id_mode.try_into(buffer);
+        buffer.put_u8(self.key_index);
     }
 }
 
@@ -199,6 +247,17 @@ impl DisassociateReq {
             key_index,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.device_address.try_into(buffer);
+        buffer.put_u16_le(self.device_pan_id);
+        self.disassociate_reason.try_into(buffer);
+        buffer.put_u8(self.tx_indirect);
+        self.key_source.try_into(buffer);
+        self.security_level.try_into(buffer);
+        self.key_id_mode.try_into(buffer);
+        buffer.put_u8(self.key_index);
+    }
 }
 
 #[derive(Debug)]
@@ -210,6 +269,10 @@ impl GetReq {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let attribute_id = MACPIBAttributeId::try_from(Read::by_ref(cursor))?;
         Ok(GetReq { attribute_id })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.attribute_id.try_into(buffer);
     }
 }
 
@@ -234,6 +297,11 @@ impl SetReq {
             attribute_value,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.attribute_id.try_into(buffer);
+        buffer.extend(self.attribute_value.iter().rev());
+    }
 }
 
 #[derive(Debug)]
@@ -254,6 +322,12 @@ impl SecurityGetReq {
             index1,
             index2,
         })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.attribute_id.try_into(buffer);
+        buffer.put_u8(self.index1);
+        buffer.put_u8(self.index2);
     }
 }
 
@@ -283,6 +357,13 @@ impl SecuritySetReq {
             attribute_value,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.attribute_id.try_into(buffer);
+        buffer.put_u8(self.index1);
+        buffer.put_u8(self.index2);
+        buffer.extend(self.attribute_value.iter());
+    }
 }
 
 #[derive(Debug)]
@@ -294,6 +375,10 @@ impl UpdatePANIdReq {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let pan_id = cursor.get_u16_le();
         Ok(UpdatePANIdReq { pan_id })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u16_le(self.pan_id);
     }
 }
 
@@ -339,6 +424,18 @@ impl AddDeviceReq {
             lookup_data,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u16_le(self.pan_id);
+        self.short_addr.try_into(buffer);
+        self.ext_addr.try_into(buffer);
+        buffer.put_u32_le(self.frame_counter);
+        buffer.put_u8(if self.exempt { 1 } else { 0 });
+        buffer.put_u8(if self.unique { 1 } else { 0 });
+        buffer.put_u8(if self.duplicate { 1 } else { 0 });
+        buffer.put_u8(self.data_size);
+        buffer.extend(self.lookup_data.iter().rev());
+    }
 }
 
 #[derive(Debug)]
@@ -351,6 +448,10 @@ impl DeleteDeviceReq {
         let ext_addr = ExtendedAddress::try_from(Read::by_ref(cursor))?;
         Ok(DeleteDeviceReq { ext_addr })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.ext_addr.try_into(buffer);
+    }
 }
 
 #[derive(Debug)]
@@ -360,6 +461,8 @@ impl DeleteAllDevicesReq {
     pub fn try_from(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         Ok(DeleteAllDevicesReq {})
     }
+
+    pub fn try_into(&self, _: &mut Vec<u8>) {}
 }
 
 #[derive(Debug)]
@@ -372,6 +475,10 @@ impl DeleteKeyReq {
         let index = cursor.get_u8();
         Ok(DeleteKeyReq { index })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(self.index);
+    }
 }
 
 #[derive(Debug)]
@@ -383,6 +490,10 @@ impl ReadKeyReq {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let index = cursor.get_u8();
         Ok(ReadKeyReq { index })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(self.index);
     }
 }
 
@@ -425,6 +536,15 @@ impl WriteKeyReq {
             lookup_data,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(if self.new { 1 } else { 0 });
+        buffer.put_u16_le(self.index);
+        buffer.extend(self.key.iter().rev());
+        buffer.put_u32_le(self.frame_counter);
+        buffer.put_u8(self.data_size);
+        buffer.extend(self.lookup_data.iter().rev());
+    }
 }
 
 #[derive(Debug)]
@@ -457,6 +577,16 @@ impl OrphanRsp {
             key_index,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.extended_address.try_into(buffer);
+        self.assoc_short_address.try_into(buffer);
+        buffer.put_u8(if self.associated_member { 1 } else { 0 });
+        self.key_source.try_into(buffer);
+        self.security_level.try_into(buffer);
+        self.key_id_mode.try_into(buffer);
+        buffer.put_u8(self.key_index);
+    }
 }
 
 #[derive(Debug)]
@@ -486,6 +616,15 @@ impl PollReq {
             key_index,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.coord_address.try_into(buffer);
+        buffer.put_u16_le(self.coord_pan_id);
+        self.key_source.try_into(buffer);
+        self.security_level.try_into(buffer);
+        self.key_id_mode.try_into(buffer);
+        buffer.put_u8(self.key_index);
+    }
 }
 
 #[derive(Debug)]
@@ -497,6 +636,10 @@ impl ResetReq {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let set_default = cursor.get_u8() != 0;
         Ok(ResetReq { set_default })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(if self.set_default { 1 } else { 0 });
     }
 }
 
@@ -556,6 +699,25 @@ impl ScanReq {
             key_index,
             channels,
         })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.scan_type.try_into(buffer);
+        buffer.put_u8(self.scan_duration);
+        buffer.put_u8(self.channel_page);
+        self.phy_id.try_into(buffer);
+        buffer.put_u8(self.max_results);
+        self.permit_join.try_into(buffer);
+        buffer.put_u8(self.link_quality);
+        buffer.put_u8(self.rsp_filter);
+        self.mpm_scan.try_into(buffer);
+        self.mpm_type.try_into(buffer);
+        buffer.put_u16_le(self.mpm_duration);
+        self.key_source.try_into(buffer);
+        self.security_level.try_into(buffer);
+        self.key_id_mode.try_into(buffer);
+        buffer.put_u8(self.key_index);
+        self.channels.try_into(buffer);
     }
 }
 
@@ -645,6 +807,33 @@ impl StartReq {
             ie_id_list,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u32_le(self.start_time);
+        buffer.put_u16_le(self.pan_id);
+        buffer.put_u8(self.logical_channel);
+        buffer.put_u8(self.channel_page);
+        self.phy_id.try_into(buffer);
+        buffer.put_u8(self.beacon_order);
+        buffer.put_u8(self.super_frame_order);
+        buffer.put_u8(if self.pan_coordinator { 1 } else { 0 });
+        buffer.put_u8(if self.battery_life_ext { 1 } else { 0 });
+        buffer.put_u8(if self.coord_realignment { 1 } else { 0 });
+        self.realign_key_source.try_into(buffer);
+        self.realign_security_level.try_into(buffer);
+        self.realign_key_id_mode.try_into(buffer);
+        buffer.put_u8(self.realign_key_index);
+        self.beacon_key_source.try_into(buffer);
+        self.beacon_security_level.try_into(buffer);
+        self.beacon_key_id_mode.try_into(buffer);
+        buffer.put_u8(self.beacon_key_index);
+        buffer.put_u8(if self.start_fh { 1 } else { 0 });
+        buffer.put_u8(self.enh_beacon_order);
+        buffer.put_u8(self.ofs_time_slot);
+        buffer.put_u16_le(self.non_beacon_order);
+        buffer.put_u8(self.num_ies);
+        buffer.extend(self.ie_id_list.iter());
+    }
 }
 
 #[derive(Debug)]
@@ -668,6 +857,13 @@ impl SyncReq {
             phy_id,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(self.logical_channel);
+        buffer.put_u8(self.channel_page);
+        buffer.put_u8(if self.track_beacon { 1 } else { 0 });
+        self.phy_id.try_into(buffer);
+    }
 }
 
 #[derive(Debug)]
@@ -679,6 +875,10 @@ impl SetRxGainReq {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let mode = cursor.get_u8() != 0;
         Ok(SetRxGainReq { mode })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(if self.mode { 1 } else { 0 });
     }
 }
 
@@ -712,6 +912,16 @@ impl WSAsyncReq {
             channels,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.operation.try_into(buffer);
+        self.frame_type.try_into(buffer);
+        self.key_source.try_into(buffer);
+        self.security_level.try_into(buffer);
+        self.key_id_mode.try_into(buffer);
+        buffer.put_u8(self.key_index);
+        self.channels.try_into(buffer);
+    }
 }
 
 #[derive(Debug)]
@@ -721,6 +931,8 @@ impl FHEnableReq {
     pub fn try_from(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         Ok(FHEnableReq {})
     }
+
+    pub fn try_into(&self, _: &mut Vec<u8>) {}
 }
 
 #[derive(Debug)]
@@ -730,6 +942,8 @@ impl FHStartReq {
     pub fn try_from(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         Ok(FHStartReq {})
     }
+
+    pub fn try_into(&self, _: &mut Vec<u8>) {}
 }
 
 #[derive(Debug)]
@@ -741,6 +955,10 @@ impl FHGetReq {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let attribute_id = FHPIBAttributeId::try_from(Read::by_ref(cursor))?;
         Ok(FHGetReq { attribute_id })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.attribute_id.try_into(buffer);
     }
 }
 
@@ -760,5 +978,10 @@ impl FHSetReq {
             .map_err(|_| Error::NotEnoughBytes)?;
 
         Ok(FHSetReq { attribute_id, data })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.attribute_id.try_into(buffer);
+        buffer.extend(self.data.iter());
     }
 }
