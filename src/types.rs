@@ -130,7 +130,9 @@ pub struct ShortAddress {
 
 impl ShortAddress {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        Ok(ShortAddress { address: cursor.get_u16_le() })
+        Ok(ShortAddress {
+            address: cursor.get_u16_le(),
+        })
     }
 
     pub fn try_into(&self, buffer: &mut Vec<u8>) {
@@ -174,9 +176,7 @@ impl Address {
                 std::io::BufRead::consume(cursor, 6);
                 address
             }
-            AddressMode::Addr64Bit => {
-                Address::Addr64Bit(ExtendedAddress::try_from(cursor)?)
-            }
+            AddressMode::Addr64Bit => Address::Addr64Bit(ExtendedAddress::try_from(cursor)?),
         };
 
         Ok(address)
