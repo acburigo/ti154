@@ -6,7 +6,7 @@ edition = "2018"
 license = "MIT"
 description = "Library for creating and parsing TI 15.4 UART packets."
 repository = "https://github.com/acburigo/ti154"
-keywords = ["IEEE 802.15.4", "TI 15.4", "15.4"]
+keywords = ["IEEE", "802.15.4", "Texas Instruments", "TI", "15.4"]
 
 [dependencies]
 bytes = "0.4.12"
