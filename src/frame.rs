@@ -102,7 +102,7 @@ impl CommandCode {
 
     pub fn try_into(&self, buffer: &mut Vec<u8>) {
         let type_and_subsystem = {
-            let value = ((self.cmd_type as u8) << 5) & (self.subsystem as u8);
+            let value = ((self.cmd_type as u8) << 5) | (self.subsystem as u8);
             if self.is_extended {
                 0x80 | value
             } else {
