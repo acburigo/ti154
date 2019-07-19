@@ -1,4 +1,6 @@
 use crate::error::Error;
+use crate::frame::{CommandCode, MTFrame, MTHeader};
+use crate::subsystem::MTFramePayload;
 use crate::types::*;
 use bytes::{Buf, BufMut};
 use std::io::Cursor;
@@ -21,6 +23,22 @@ impl CallbackSubCmd {
         self.status.encode_into(buffer);
         buffer.put_u32_le(self.enables);
     }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x05,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::UTIL,
+                    id: 0x06,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::UTIL_CallbackSubCmd_SRSP(self),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -42,6 +60,22 @@ impl GetExtAddr {
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.address_type.encode_into(buffer);
         self.ext_address.encode_into(buffer);
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x09,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::UTIL,
+                    id: 0xee,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::UTIL_GetExtAddr_SRSP(self),
+        }
     }
 }
 
@@ -74,6 +108,22 @@ impl Loopback {
         buffer.put_u32_le(self.interval);
         buffer.extend(self.data.iter());
     }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x05 + self.data.len() as u8,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::UTIL,
+                    id: 0x10,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::UTIL_Loopback_SRSP(self),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -89,5 +139,21 @@ impl Random {
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u16_le(self.number);
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x02,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::UTIL,
+                    id: 0x12,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::UTIL_Random_SRSP(self),
+        }
     }
 }

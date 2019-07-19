@@ -1,4 +1,7 @@
 use crate::error::Error;
+use crate::frame::{CommandCode, MTFrame, MTHeader};
+use crate::subsystem::MTFramePayload;
+use crate::types::{CommandType, MTSubsystem};
 use bytes::{Buf, BufMut};
 use std::io::Cursor;
 use std::io::Read;
@@ -31,5 +34,21 @@ impl Loopback {
         buffer.put_u8(self.repeats);
         buffer.put_u32_le(self.interval);
         buffer.extend(self.data.iter());
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x05 + self.data.len() as u8,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::AREQ,
+                    subsystem: MTSubsystem::UTIL,
+                    id: 0x10,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::UTIL_Loopback_AREQ(self),
+        }
     }
 }
