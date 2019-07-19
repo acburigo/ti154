@@ -1,5 +1,5 @@
 use crate::error::Error;
-use bytes::Buf;
+use bytes::{Buf, BufMut};
 use std::io::Cursor;
 use std::io::Read;
 
@@ -10,6 +10,8 @@ impl PingReq {
     pub fn try_from(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         Ok(PingReq {})
     }
+
+    pub fn try_into(&self, _: &mut Vec<u8>) {}
 }
 
 #[derive(Debug)]
@@ -19,6 +21,8 @@ impl VersionReq {
     pub fn try_from(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         Ok(VersionReq {})
     }
+
+    pub fn try_into(&self, _: &mut Vec<u8>) {}
 }
 
 #[derive(Debug)]
@@ -42,6 +46,13 @@ impl NVCreateReq {
             length,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(self.sys_id);
+        buffer.put_u16_le(self.item_id);
+        buffer.put_u16_le(self.sub_id);
+        buffer.put_u32_le(self.length);
+    }
 }
 
 #[derive(Debug)]
@@ -62,6 +73,12 @@ impl NVDeleteReq {
             sub_id,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(self.sys_id);
+        buffer.put_u16_le(self.item_id);
+        buffer.put_u16_le(self.sub_id);
+    }
 }
 
 #[derive(Debug)]
@@ -81,6 +98,12 @@ impl NVLengthReq {
             item_id,
             sub_id,
         })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(self.sys_id);
+        buffer.put_u16_le(self.item_id);
+        buffer.put_u16_le(self.sub_id);
     }
 }
 
@@ -107,6 +130,14 @@ impl NVReadReq {
             offset,
             length,
         })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(self.sys_id);
+        buffer.put_u16_le(self.item_id);
+        buffer.put_u16_le(self.sub_id);
+        buffer.put_u16_le(self.offset);
+        buffer.put_u8(self.length);
     }
 }
 
@@ -142,6 +173,15 @@ impl NVWriteReq {
             data,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(self.sys_id);
+        buffer.put_u16_le(self.item_id);
+        buffer.put_u16_le(self.sub_id);
+        buffer.put_u16_le(self.offset);
+        buffer.put_u8(self.length);
+        buffer.extend(self.data.iter());
+    }
 }
 
 #[derive(Debug)]
@@ -173,6 +213,14 @@ impl NVUpdateReq {
             data,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(self.sys_id);
+        buffer.put_u16_le(self.item_id);
+        buffer.put_u16_le(self.sub_id);
+        buffer.put_u8(self.length);
+        buffer.extend(self.data.iter());
+    }
 }
 
 #[derive(Debug)]
@@ -184,5 +232,9 @@ impl NVCompactReq {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let threshold = cursor.get_u16_le();
         Ok(NVCompactReq { threshold })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u16_le(self.threshold);
     }
 }

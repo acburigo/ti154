@@ -1,6 +1,6 @@
 use crate::error::Error;
 use crate::types::*;
-use bytes::Buf;
+use bytes::{Buf, BufMut};
 use std::io::Cursor;
 use std::io::Read;
 
@@ -13,6 +13,10 @@ impl PingReq {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let capabilities = cursor.get_u16_le();
         Ok(PingReq { capabilities })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u16_le(self.capabilities);
     }
 }
 
@@ -40,6 +44,14 @@ impl VersionReq {
             maint,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.transport.try_into(buffer);
+        self.product.try_into(buffer);
+        buffer.put_u8(self.major);
+        buffer.put_u8(self.minor);
+        buffer.put_u8(self.maint);
+    }
 }
 
 #[derive(Debug)]
@@ -51,6 +63,10 @@ impl NVCreateReq {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(NVCreateReq { status })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
     }
 }
 
@@ -64,6 +80,10 @@ impl NVDeleteReq {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(NVDeleteReq { status })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
+    }
 }
 
 #[derive(Debug)]
@@ -75,6 +95,10 @@ impl NVLengthReq {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let length = cursor.get_u32_le();
         Ok(NVLengthReq { length })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u32_le(self.length);
     }
 }
 
@@ -101,6 +125,12 @@ impl NVReadReq {
             data,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
+        buffer.put_u8(self.length);
+        buffer.extend(self.data.iter());
+    }
 }
 
 #[derive(Debug)]
@@ -112,6 +142,10 @@ impl NVWriteReq {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(NVWriteReq { status })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
     }
 }
 
@@ -125,6 +159,10 @@ impl NVUpdateReq {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(NVUpdateReq { status })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
+    }
 }
 
 #[derive(Debug)]
@@ -136,5 +174,9 @@ impl NVCompactReq {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_from(Read::by_ref(cursor))?;
         Ok(NVCompactReq { status })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
     }
 }
