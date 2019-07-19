@@ -1,5 +1,5 @@
 use crate::error::Error;
-use bytes::Buf;
+use bytes::{Buf, BufMut};
 use std::io::Cursor;
 use std::io::Read;
 
@@ -25,5 +25,11 @@ impl Loopback {
             interval,
             data,
         })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(self.repeats);
+        buffer.put_u32_le(self.interval);
+        buffer.extend(self.data.iter());
     }
 }

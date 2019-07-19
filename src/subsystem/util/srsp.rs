@@ -1,6 +1,6 @@
 use crate::error::Error;
 use crate::types::*;
-use bytes::Buf;
+use bytes::{Buf, BufMut};
 use std::io::Cursor;
 use std::io::Read;
 
@@ -15,6 +15,11 @@ impl CallbackSubCmd {
         let status = Status::try_from(Read::by_ref(cursor))?;
         let enables = cursor.get_u32_le();
         Ok(CallbackSubCmd { status, enables })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.status.try_into(buffer);
+        buffer.put_u32_le(self.enables);
     }
 }
 
@@ -32,6 +37,11 @@ impl GetExtAddr {
             address_type,
             ext_address,
         })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.address_type.try_into(buffer);
+        self.ext_address.try_into(buffer);
     }
 }
 
@@ -58,6 +68,12 @@ impl Loopback {
             data,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(self.repeats);
+        buffer.put_u32_le(self.interval);
+        buffer.extend(self.data.iter());
+    }
 }
 
 #[derive(Debug)]
@@ -69,5 +85,9 @@ impl Random {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let number = cursor.get_u16_le();
         Ok(Random { number })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u16_le(self.number);
     }
 }
