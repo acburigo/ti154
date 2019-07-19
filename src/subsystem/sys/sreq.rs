@@ -7,22 +7,22 @@ use std::io::Read;
 pub struct PingReq {}
 
 impl PingReq {
-    pub fn try_from(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         Ok(PingReq {})
     }
 
-    pub fn try_into(&self, _: &mut Vec<u8>) {}
+    pub fn encode_into(&self, _: &mut Vec<u8>) {}
 }
 
 #[derive(Debug)]
 pub struct VersionReq {}
 
 impl VersionReq {
-    pub fn try_from(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         Ok(VersionReq {})
     }
 
-    pub fn try_into(&self, _: &mut Vec<u8>) {}
+    pub fn encode_into(&self, _: &mut Vec<u8>) {}
 }
 
 #[derive(Debug)]
@@ -34,7 +34,7 @@ pub struct NVCreateReq {
 }
 
 impl NVCreateReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let sys_id = cursor.get_u8();
         let item_id = cursor.get_u16_le();
         let sub_id = cursor.get_u16_le();
@@ -47,7 +47,7 @@ impl NVCreateReq {
         })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(self.sys_id);
         buffer.put_u16_le(self.item_id);
         buffer.put_u16_le(self.sub_id);
@@ -63,7 +63,7 @@ pub struct NVDeleteReq {
 }
 
 impl NVDeleteReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let sys_id = cursor.get_u8();
         let item_id = cursor.get_u16_le();
         let sub_id = cursor.get_u16_le();
@@ -74,7 +74,7 @@ impl NVDeleteReq {
         })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(self.sys_id);
         buffer.put_u16_le(self.item_id);
         buffer.put_u16_le(self.sub_id);
@@ -89,7 +89,7 @@ pub struct NVLengthReq {
 }
 
 impl NVLengthReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let sys_id = cursor.get_u8();
         let item_id = cursor.get_u16_le();
         let sub_id = cursor.get_u16_le();
@@ -100,7 +100,7 @@ impl NVLengthReq {
         })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(self.sys_id);
         buffer.put_u16_le(self.item_id);
         buffer.put_u16_le(self.sub_id);
@@ -117,7 +117,7 @@ pub struct NVReadReq {
 }
 
 impl NVReadReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let sys_id = cursor.get_u8();
         let item_id = cursor.get_u16_le();
         let sub_id = cursor.get_u16_le();
@@ -132,7 +132,7 @@ impl NVReadReq {
         })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(self.sys_id);
         buffer.put_u16_le(self.item_id);
         buffer.put_u16_le(self.sub_id);
@@ -152,7 +152,7 @@ pub struct NVWriteReq {
 }
 
 impl NVWriteReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let sys_id = cursor.get_u8();
         let item_id = cursor.get_u16_le();
         let sub_id = cursor.get_u16_le();
@@ -174,7 +174,7 @@ impl NVWriteReq {
         })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(self.sys_id);
         buffer.put_u16_le(self.item_id);
         buffer.put_u16_le(self.sub_id);
@@ -194,7 +194,7 @@ pub struct NVUpdateReq {
 }
 
 impl NVUpdateReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let sys_id = cursor.get_u8();
         let item_id = cursor.get_u16_le();
         let sub_id = cursor.get_u16_le();
@@ -214,7 +214,7 @@ impl NVUpdateReq {
         })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(self.sys_id);
         buffer.put_u16_le(self.item_id);
         buffer.put_u16_le(self.sub_id);
@@ -229,12 +229,12 @@ pub struct NVCompactReq {
 }
 
 impl NVCompactReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let threshold = cursor.get_u16_le();
         Ok(NVCompactReq { threshold })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u16_le(self.threshold);
     }
 }

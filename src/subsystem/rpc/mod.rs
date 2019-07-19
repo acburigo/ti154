@@ -4,7 +4,7 @@ use crate::subsystem::MTFramePayload;
 use crate::types::{CommandType, ErrorCode};
 use std::io::Cursor;
 
-pub fn try_from(
+pub fn try_decode(
     header: &MTHeader,
     _: &Option<MTExtendedHeader>,
     cursor: &mut Cursor<&[u8]>,
@@ -16,7 +16,7 @@ pub fn try_from(
         CommandType::SREQ => Err(Error::NotImplemented),
         CommandType::AREQ => Err(Error::NotImplemented),
         CommandType::SRSP => match header.command.id {
-            0x00 => MTCommandError::try_from(cursor).map(|x| RPC_MTCommandError(x)),
+            0x00 => MTCommandError::try_decode(cursor).map(|x| RPC_MTCommandError(x)),
             _ => Err(Error::NotImplemented),
         },
     }
@@ -29,17 +29,17 @@ pub struct MTCommandError {
 }
 
 impl MTCommandError {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let error_code = ErrorCode::try_from(cursor)?;
-        let command = CommandCode::try_from(cursor)?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let error_code = ErrorCode::try_decode(cursor)?;
+        let command = CommandCode::try_decode(cursor)?;
         Ok(MTCommandError {
             error_code,
             command,
         })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.error_code.try_into(buffer);
-        self.command.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.error_code.encode_into(buffer);
+        self.command.encode_into(buffer);
     }
 }

@@ -71,7 +71,7 @@ impl Parser {
 
     fn parse_frame(&self) -> Result<MTFrame, Error> {
         let mut cursor = Cursor::new(self.buffer.as_slice());
-        MTFrame::try_from(&mut cursor)
+        MTFrame::try_decode(&mut cursor)
     }
 
     fn compute_frame_check_sequence(mt_frame_bytes: &[u8]) -> u8 {

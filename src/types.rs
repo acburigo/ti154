@@ -27,12 +27,12 @@ pub enum MTExtendedHeaderStatus {
 }
 
 impl MTExtendedHeaderStatus {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidExtendedHeaderStatus(value))
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(*self as u8);
     }
 }
@@ -107,12 +107,12 @@ pub enum Status {
 }
 
 impl Status {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidStatus(value))
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(*self as u8);
     }
 }
@@ -124,12 +124,12 @@ pub enum AddressMode {
 }
 
 impl AddressMode {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidAddressMode(value))
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(*self as u8);
     }
 }
@@ -140,13 +140,13 @@ pub struct ShortAddress {
 }
 
 impl ShortAddress {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         Ok(ShortAddress {
             address: cursor.get_u16_le(),
         })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u16_le(self.address);
     }
 }
@@ -157,7 +157,7 @@ pub struct ExtendedAddress {
 }
 
 impl ExtendedAddress {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let mut address: [u8; 8] = Default::default();
         cursor
             .read_exact(&mut address)
@@ -166,7 +166,7 @@ impl ExtendedAddress {
         Ok(ExtendedAddress { address })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.extend(self.address.iter().rev());
     }
 }
@@ -178,30 +178,30 @@ pub enum Address {
 }
 
 impl Address {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let address_mode = AddressMode::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let address_mode = AddressMode::try_decode(Read::by_ref(cursor))?;
 
         let address = match address_mode {
             AddressMode::Addr16Bit => {
-                let address = Address::Addr16Bit(ShortAddress::try_from(cursor)?);
+                let address = Address::Addr16Bit(ShortAddress::try_decode(cursor)?);
                 std::io::BufRead::consume(cursor, 6);
                 address
             }
-            AddressMode::Addr64Bit => Address::Addr64Bit(ExtendedAddress::try_from(cursor)?),
+            AddressMode::Addr64Bit => Address::Addr64Bit(ExtendedAddress::try_decode(cursor)?),
         };
 
         Ok(address)
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         match self {
             Address::Addr16Bit(address) => {
                 buffer.put_u8(AddressMode::Addr16Bit as u8);
-                address.try_into(buffer);
+                address.encode_into(buffer);
             }
             Address::Addr64Bit(address) => {
                 buffer.put_u8(AddressMode::Addr64Bit as u8);
-                address.try_into(buffer);
+                address.encode_into(buffer);
             }
         }
     }
@@ -241,12 +241,12 @@ pub enum TxOption {
 }
 
 impl TxOption {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidTxOption(value))
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(*self as u8);
     }
 }
@@ -264,12 +264,12 @@ pub enum SecurityLevel {
 }
 
 impl SecurityLevel {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidSecurityLevel(value))
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(*self as u8);
     }
 }
@@ -283,12 +283,12 @@ pub enum KeyIdMode {
 }
 
 impl KeyIdMode {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidKeyIdMode(value))
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(*self as u8);
     }
 }
@@ -299,7 +299,7 @@ pub struct KeySource {
 }
 
 impl KeySource {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let mut key: [u8; 8] = Default::default();
         cursor
             .read_exact(&mut key)
@@ -308,7 +308,7 @@ impl KeySource {
         Ok(KeySource { key })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.extend(self.key.iter().rev());
     }
 }
@@ -326,12 +326,12 @@ pub enum WiSUNAsyncFrameType {
 }
 
 impl WiSUNAsyncFrameType {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidFrameType(value))
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(*self as u8);
     }
 }
@@ -344,12 +344,12 @@ pub enum AssociationStatus {
 }
 
 impl AssociationStatus {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidAssociationStatus(value))
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(*self as u8);
     }
 }
@@ -362,12 +362,12 @@ pub enum DisassociateReason {
 }
 
 impl DisassociateReason {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidDisassociationReason(value))
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(*self as u8);
     }
 }
@@ -424,12 +424,12 @@ pub enum MACPIBAttributeId {
 }
 
 impl MACPIBAttributeId {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidMACPIBAttributeId(value))
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(*self as u8);
     }
 }
@@ -465,12 +465,12 @@ pub enum FHPIBAttributeId {
 }
 
 impl FHPIBAttributeId {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u16_le();
         FromPrimitive::from_u16(value).ok_or(Error::InvalidFHPIBAttributeId(value))
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u16_le(*self as u16);
     }
 }
@@ -498,12 +498,12 @@ pub enum SecurityPIBAttributeId {
 }
 
 impl SecurityPIBAttributeId {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidSecurityPIBAttributeId(value))
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(*self as u8);
     }
 }
@@ -518,12 +518,12 @@ pub enum ScanType {
 }
 
 impl ScanType {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidScanType(value))
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(*self as u8);
     }
 }
@@ -538,12 +538,12 @@ pub enum PhyId {
 }
 
 impl PhyId {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(*self as u8);
     }
 }
@@ -555,12 +555,12 @@ pub enum PermitJoin {
 }
 
 impl PermitJoin {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(*self as u8);
     }
 }
@@ -572,12 +572,12 @@ pub enum MPMScan {
 }
 
 impl MPMScan {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(*self as u8);
     }
 }
@@ -589,12 +589,12 @@ pub enum MPMType {
 }
 
 impl MPMType {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(*self as u8);
     }
 }
@@ -606,12 +606,12 @@ pub enum WiSUNAsyncOperation {
 }
 
 impl WiSUNAsyncOperation {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(*self as u8);
     }
 }
@@ -624,12 +624,12 @@ pub enum CommEventReason {
 }
 
 impl CommEventReason {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(*self as u8);
     }
 }
@@ -641,12 +641,12 @@ pub enum ResetType {
 }
 
 impl ResetType {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(*self as u8);
     }
 }
@@ -658,12 +658,12 @@ pub enum TransportProtocolRevision {
 }
 
 impl TransportProtocolRevision {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(*self as u8);
     }
 }
@@ -675,12 +675,12 @@ pub enum ProductIdCode {
 }
 
 impl ProductIdCode {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(*self as u8);
     }
 }
@@ -695,12 +695,12 @@ pub enum ResetReason {
 }
 
 impl ResetReason {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(*self as u8);
     }
 }
@@ -714,12 +714,12 @@ pub enum SubsystemId {
 }
 
 impl SubsystemId {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(*self as u8);
     }
 }
@@ -734,12 +734,12 @@ pub enum ExtendedAddressType {
 }
 
 impl ExtendedAddressType {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidPhyId(value))
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(*self as u8);
     }
 }
@@ -750,7 +750,7 @@ pub struct ChannelsBitMap {
 }
 
 impl ChannelsBitMap {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let mut channels: [u8; 17] = Default::default();
         cursor
             .read_exact(&mut channels)
@@ -759,7 +759,7 @@ impl ChannelsBitMap {
         Ok(ChannelsBitMap { channels })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.extend(self.channels.iter().rev());
     }
 }
@@ -775,12 +775,12 @@ pub enum ErrorCode {
 }
 
 impl ErrorCode {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
         FromPrimitive::from_u8(value).ok_or(Error::InvalidErrorCode(value))
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(*self as u8);
     }
 }

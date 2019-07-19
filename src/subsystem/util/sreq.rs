@@ -11,8 +11,8 @@ pub struct CallbackSubCmd {
 }
 
 impl CallbackSubCmd {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let subsystem_id = SubsystemId::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let subsystem_id = SubsystemId::try_decode(Read::by_ref(cursor))?;
         let enables = cursor.get_u32_le();
         Ok(CallbackSubCmd {
             subsystem_id,
@@ -20,8 +20,8 @@ impl CallbackSubCmd {
         })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.subsystem_id.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.subsystem_id.encode_into(buffer);
         buffer.put_u32_le(self.enables);
     }
 }
@@ -32,13 +32,13 @@ pub struct GetExtAddr {
 }
 
 impl GetExtAddr {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let address_type = ExtendedAddressType::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let address_type = ExtendedAddressType::try_decode(Read::by_ref(cursor))?;
         Ok(GetExtAddr { address_type })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.address_type.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.address_type.encode_into(buffer);
     }
 }
 
@@ -50,7 +50,7 @@ pub struct Loopback {
 }
 
 impl Loopback {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let repeats = cursor.get_u8();
         let interval = cursor.get_u32_le();
 
@@ -66,7 +66,7 @@ impl Loopback {
         })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(self.repeats);
         buffer.put_u32_le(self.interval);
         buffer.extend(self.data.iter());
@@ -77,9 +77,9 @@ impl Loopback {
 pub struct Random {}
 
 impl Random {
-    pub fn try_from(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         Ok(Random {})
     }
 
-    pub fn try_into(&self, _: &mut Vec<u8>) {}
+    pub fn encode_into(&self, _: &mut Vec<u8>) {}
 }

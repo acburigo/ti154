@@ -11,7 +11,7 @@ pub struct Loopback {
 }
 
 impl Loopback {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let repeats = cursor.get_u8();
         let interval = cursor.get_u32_le();
 
@@ -27,7 +27,7 @@ impl Loopback {
         })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(self.repeats);
         buffer.put_u32_le(self.interval);
         buffer.extend(self.data.iter());

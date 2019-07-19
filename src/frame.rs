@@ -13,16 +13,16 @@ pub struct MTFrame {
 }
 
 impl MTFrame {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let header = MTHeader::try_from(cursor.by_ref())?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let header = MTHeader::try_decode(cursor.by_ref())?;
 
         let extended_header = if header.has_extension() {
-            Some(MTExtendedHeader::try_from(cursor.by_ref())?)
+            Some(MTExtendedHeader::try_decode(cursor.by_ref())?)
         } else {
             None
         };
 
-        let payload = MTFramePayload::try_from(&header, &extended_header, cursor.by_ref())?;
+        let payload = MTFramePayload::try_decode(&header, &extended_header, cursor.by_ref())?;
 
         Ok(MTFrame {
             header,
@@ -31,14 +31,14 @@ impl MTFrame {
         })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.header.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.header.encode_into(buffer);
 
         if let Some(ref extended_header) = self.extended_header {
-            extended_header.try_into(buffer);
+            extended_header.encode_into(buffer);
         }
 
-        self.payload.try_into(buffer);
+        self.payload.encode_into(buffer);
     }
 }
 
@@ -57,15 +57,15 @@ impl MTHeader {
         self.command.is_extended
     }
 
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let length = cursor.get_u8();
-        let command = CommandCode::try_from(cursor)?;
+        let command = CommandCode::try_decode(cursor)?;
         Ok(MTHeader { length, command })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(self.length);
-        self.command.try_into(buffer);
+        self.command.encode_into(buffer);
     }
 }
 
@@ -78,7 +78,7 @@ pub struct CommandCode {
 }
 
 impl CommandCode {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let type_and_subsystem = cursor.get_u8();
         let id = cursor.get_u8();
 
@@ -100,7 +100,7 @@ impl CommandCode {
         })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         let type_and_subsystem = {
             let value = ((self.cmd_type as u8) << 5) | (self.subsystem as u8);
             if self.is_extended {
@@ -137,7 +137,7 @@ pub enum MTExtendedHeader {
 }
 
 impl MTExtendedHeader {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let version_and_stack_id = cursor.get_u8();
         let version = (version_and_stack_id & 0xf8) >> 3;
         let stack_id = version_and_stack_id & 0x07;
@@ -158,7 +158,7 @@ impl MTExtendedHeader {
         }
 
         if version == 3 || version == 4 {
-            let status = MTExtendedHeaderStatus::try_from(cursor)?;
+            let status = MTExtendedHeaderStatus::try_decode(cursor)?;
 
             if version == 3 {
                 return Ok(MTExtendedHeader::V3 {
@@ -178,7 +178,7 @@ impl MTExtendedHeader {
         Err(Error::NotImplemented)
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         match self {
             MTExtendedHeader::V1 { stack_id } => {
                 let version_and_stack_id = (1 << 3) | stack_id;
@@ -202,7 +202,7 @@ impl MTExtendedHeader {
                 let version_and_stack_id = (3 << 3) | stack_id;
                 buffer.put_u8(version_and_stack_id);
                 buffer.put_u8(*block);
-                status.try_into(buffer);
+                status.encode_into(buffer);
             }
             MTExtendedHeader::V4 {
                 stack_id,
@@ -212,7 +212,7 @@ impl MTExtendedHeader {
                 let version_and_stack_id = (4 << 3) | stack_id;
                 buffer.put_u8(version_and_stack_id);
                 buffer.put_u8(*block);
-                status.try_into(buffer);
+                status.encode_into(buffer);
             }
         }
     }

@@ -10,10 +10,10 @@ mod tests {
     use std::io::Cursor;
 
     #[test]
-    fn parse_mt_header_1() {
+    fn decode_mt_header_1() {
         let data = [0x00, 0x01, 0x02];
         let mut cursor = Cursor::new(&data[..]);
-        let header = frame::MTHeader::try_from(&mut cursor).unwrap();
+        let header = frame::MTHeader::try_decode(&mut cursor).unwrap();
         assert_eq!(header.length, 0);
         assert_eq!(header.has_extension(), false);
         assert_eq!(header.command.cmd_type, types::CommandType::POLL);
@@ -22,10 +22,10 @@ mod tests {
     }
 
     #[test]
-    fn parse_mt_header_2() {
+    fn decode_mt_header_2() {
         let data = [0xFF, 0x81, 0x0A];
         let mut cursor = Cursor::new(&data[..]);
-        let header = frame::MTHeader::try_from(&mut cursor).unwrap();
+        let header = frame::MTHeader::try_decode(&mut cursor).unwrap();
         assert_eq!(header.length, 255);
         assert_eq!(header.has_extension(), true);
         assert_eq!(header.command.cmd_type, types::CommandType::POLL);
@@ -34,10 +34,10 @@ mod tests {
     }
 
     #[test]
-    fn parse_sys_reset_ind() {
+    fn decode_sys_reset_ind() {
         let data = [0x6, 0x41, 0x80, 0x0, 0x3, 0x1, 0x2, 0x2, 0x0];
         let mut cursor = Cursor::new(&data[..]);
-        let frame = frame::MTFrame::try_from(&mut cursor).unwrap();
+        let frame = frame::MTFrame::try_decode(&mut cursor).unwrap();
         assert_eq!(frame.header.length, 0x06);
         assert_eq!(frame.header.has_extension(), false);
         assert_eq!(frame.header.command.cmd_type, types::CommandType::AREQ);
@@ -61,10 +61,10 @@ mod tests {
     }
 
     #[test]
-    fn parse_mac_reset_req_srsp() {
+    fn decode_mac_reset_req_srsp() {
         let data = [0x1, 0x62, 0x1, 0x0];
         let mut cursor = Cursor::new(&data[..]);
-        let frame = frame::MTFrame::try_from(&mut cursor).unwrap();
+        let frame = frame::MTFrame::try_decode(&mut cursor).unwrap();
         assert_eq!(frame.header.length, 0x01);
         assert_eq!(frame.header.has_extension(), false);
         assert_eq!(frame.header.command.cmd_type, types::CommandType::SRSP);
@@ -77,5 +77,20 @@ mod tests {
         } else {
             panic!("Incorrect payload type.");
         }
+    }
+
+    #[test]
+    fn decode_encode_mac_reset_req_srsp() {
+        // Decode
+        let data = [0x1, 0x62, 0x1, 0x0];
+        let mut cursor = Cursor::new(&data[..]);
+        let frame = frame::MTFrame::try_decode(&mut cursor).unwrap();
+
+        // Encode
+        let mut buffer = Vec::new();
+        frame.encode_into(&mut buffer);
+
+        // Check
+        assert_eq!(buffer, data);
     }
 }

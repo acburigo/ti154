@@ -10,13 +10,13 @@ pub struct ResetReq {
 }
 
 impl ResetReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let reset_type = ResetType::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let reset_type = ResetType::try_decode(Read::by_ref(cursor))?;
         Ok(ResetReq { reset_type })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.reset_type.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.reset_type.encode_into(buffer);
     }
 }
 
@@ -31,10 +31,10 @@ pub struct ResetInd {
 }
 
 impl ResetInd {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let reason = ResetReason::try_from(Read::by_ref(cursor))?;
-        let transport = TransportProtocolRevision::try_from(Read::by_ref(cursor))?;
-        let product = ProductIdCode::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let reason = ResetReason::try_decode(Read::by_ref(cursor))?;
+        let transport = TransportProtocolRevision::try_decode(Read::by_ref(cursor))?;
+        let product = ProductIdCode::try_decode(Read::by_ref(cursor))?;
         let major = cursor.get_u8();
         let minor = cursor.get_u8();
         let maint = cursor.get_u8();
@@ -48,10 +48,10 @@ impl ResetInd {
         })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.reason.try_into(buffer);
-        self.transport.try_into(buffer);
-        self.product.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.reason.encode_into(buffer);
+        self.transport.encode_into(buffer);
+        self.product.encode_into(buffer);
         buffer.put_u8(self.major);
         buffer.put_u8(self.minor);
         buffer.put_u8(self.maint);

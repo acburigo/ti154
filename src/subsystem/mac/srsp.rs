@@ -10,13 +10,13 @@ pub struct Init {
 }
 
 impl Init {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(Init { status })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
     }
 }
 
@@ -26,13 +26,13 @@ pub struct DataReq {
 }
 
 impl DataReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(DataReq { status })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
     }
 }
 
@@ -42,13 +42,13 @@ pub struct PurgeReq {
 }
 
 impl PurgeReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(PurgeReq { status })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
     }
 }
 
@@ -58,13 +58,13 @@ pub struct AssociateReq {
 }
 
 impl AssociateReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(AssociateReq { status })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
     }
 }
 
@@ -74,13 +74,13 @@ pub struct AssociateRsp {
 }
 
 impl AssociateRsp {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(AssociateRsp { status })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
     }
 }
 
@@ -90,13 +90,13 @@ pub struct DisassociateReq {
 }
 
 impl DisassociateReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(DisassociateReq { status })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
     }
 }
 
@@ -107,8 +107,8 @@ pub struct GetReq {
 }
 
 impl GetReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
 
         let mut data: [u8; 16] = Default::default();
         cursor
@@ -119,8 +119,8 @@ impl GetReq {
         Ok(GetReq { status, data })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
         buffer.extend(self.data.iter().rev());
     }
 }
@@ -131,13 +131,13 @@ pub struct SetReq {
 }
 
 impl SetReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(SetReq { status })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
     }
 }
 
@@ -150,8 +150,8 @@ pub struct SecurityGetReq {
 }
 
 impl SecurityGetReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         let index1 = cursor.get_u8();
         let index2 = cursor.get_u8();
 
@@ -168,8 +168,8 @@ impl SecurityGetReq {
         })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
         buffer.put_u8(self.index1);
         buffer.put_u8(self.index2);
         buffer.extend(self.data.iter());
@@ -182,13 +182,13 @@ pub struct SecuritySetReq {
 }
 
 impl SecuritySetReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(SecuritySetReq { status })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
     }
 }
 
@@ -198,13 +198,13 @@ pub struct UpdatePANIdReq {
 }
 
 impl UpdatePANIdReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(UpdatePANIdReq { status })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
     }
 }
 
@@ -214,13 +214,13 @@ pub struct AddDeviceReq {
 }
 
 impl AddDeviceReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(AddDeviceReq { status })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
     }
 }
 
@@ -230,13 +230,13 @@ pub struct DeleteDeviceReq {
 }
 
 impl DeleteDeviceReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(DeleteDeviceReq { status })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
     }
 }
 
@@ -246,13 +246,13 @@ pub struct DeleteAllDevicesReq {
 }
 
 impl DeleteAllDevicesReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(DeleteAllDevicesReq { status })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
     }
 }
 
@@ -262,13 +262,13 @@ pub struct DeleteKeyReq {
 }
 
 impl DeleteKeyReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(DeleteKeyReq { status })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
     }
 }
 
@@ -279,8 +279,8 @@ pub struct ReadKeyReq {
 }
 
 impl ReadKeyReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         let frame_counter = cursor.get_u32_le();
         Ok(ReadKeyReq {
             status,
@@ -288,8 +288,8 @@ impl ReadKeyReq {
         })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
         buffer.put_u32_le(self.frame_counter);
     }
 }
@@ -300,13 +300,13 @@ pub struct WriteKeyReq {
 }
 
 impl WriteKeyReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(WriteKeyReq { status })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
     }
 }
 
@@ -316,13 +316,13 @@ pub struct OrphanRsp {
 }
 
 impl OrphanRsp {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(OrphanRsp { status })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
     }
 }
 
@@ -332,13 +332,13 @@ pub struct PollReq {
 }
 
 impl PollReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(PollReq { status })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
     }
 }
 
@@ -348,13 +348,13 @@ pub struct ResetReq {
 }
 
 impl ResetReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(ResetReq { status })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
     }
 }
 
@@ -364,13 +364,13 @@ pub struct ScanReq {
 }
 
 impl ScanReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(ScanReq { status })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
     }
 }
 
@@ -380,13 +380,13 @@ pub struct StartReq {
 }
 
 impl StartReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(StartReq { status })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
     }
 }
 
@@ -396,13 +396,13 @@ pub struct SyncReq {
 }
 
 impl SyncReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(SyncReq { status })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
     }
 }
 
@@ -412,13 +412,13 @@ pub struct SetRxGainReq {
 }
 
 impl SetRxGainReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(SetRxGainReq { status })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
     }
 }
 
@@ -428,13 +428,13 @@ pub struct WSAsyncReq {
 }
 
 impl WSAsyncReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(WSAsyncReq { status })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
     }
 }
 
@@ -444,13 +444,13 @@ pub struct FHEnableReq {
 }
 
 impl FHEnableReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(FHEnableReq { status })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
     }
 }
 
@@ -460,13 +460,13 @@ pub struct FHStartReq {
 }
 
 impl FHStartReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(FHStartReq { status })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
     }
 }
 
@@ -477,8 +477,8 @@ pub struct FHGetReq {
 }
 
 impl FHGetReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
 
         let mut data = Vec::new();
         cursor
@@ -488,8 +488,8 @@ impl FHGetReq {
         Ok(FHGetReq { status, data })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
         buffer.extend(self.data.iter());
     }
 }
@@ -500,12 +500,12 @@ pub struct FHSetReq {
 }
 
 impl FHSetReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(FHSetReq { status })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
     }
 }

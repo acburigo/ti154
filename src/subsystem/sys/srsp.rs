@@ -10,12 +10,12 @@ pub struct PingReq {
 }
 
 impl PingReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let capabilities = cursor.get_u16_le();
         Ok(PingReq { capabilities })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u16_le(self.capabilities);
     }
 }
@@ -30,9 +30,9 @@ pub struct VersionReq {
 }
 
 impl VersionReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let transport = TransportProtocolRevision::try_from(Read::by_ref(cursor))?;
-        let product = ProductIdCode::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let transport = TransportProtocolRevision::try_decode(Read::by_ref(cursor))?;
+        let product = ProductIdCode::try_decode(Read::by_ref(cursor))?;
         let major = cursor.get_u8();
         let minor = cursor.get_u8();
         let maint = cursor.get_u8();
@@ -45,9 +45,9 @@ impl VersionReq {
         })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.transport.try_into(buffer);
-        self.product.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.transport.encode_into(buffer);
+        self.product.encode_into(buffer);
         buffer.put_u8(self.major);
         buffer.put_u8(self.minor);
         buffer.put_u8(self.maint);
@@ -60,13 +60,13 @@ pub struct NVCreateReq {
 }
 
 impl NVCreateReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(NVCreateReq { status })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
     }
 }
 
@@ -76,13 +76,13 @@ pub struct NVDeleteReq {
 }
 
 impl NVDeleteReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(NVDeleteReq { status })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
     }
 }
 
@@ -92,12 +92,12 @@ pub struct NVLengthReq {
 }
 
 impl NVLengthReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let length = cursor.get_u32_le();
         Ok(NVLengthReq { length })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u32_le(self.length);
     }
 }
@@ -110,8 +110,8 @@ pub struct NVReadReq {
 }
 
 impl NVReadReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         let length = cursor.get_u8();
 
         let mut data = Vec::new();
@@ -126,8 +126,8 @@ impl NVReadReq {
         })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
         buffer.put_u8(self.length);
         buffer.extend(self.data.iter());
     }
@@ -139,13 +139,13 @@ pub struct NVWriteReq {
 }
 
 impl NVWriteReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(NVWriteReq { status })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
     }
 }
 
@@ -155,13 +155,13 @@ pub struct NVUpdateReq {
 }
 
 impl NVUpdateReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(NVUpdateReq { status })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
     }
 }
 
@@ -171,12 +171,12 @@ pub struct NVCompactReq {
 }
 
 impl NVCompactReq {
-    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_from(Read::by_ref(cursor))?;
+    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(NVCompactReq { status })
     }
 
-    pub fn try_into(&self, buffer: &mut Vec<u8>) {
-        self.status.try_into(buffer);
+    pub fn encode_into(&self, buffer: &mut Vec<u8>) {
+        self.status.encode_into(buffer);
     }
 }
