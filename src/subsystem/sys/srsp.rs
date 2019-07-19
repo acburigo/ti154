@@ -1,4 +1,6 @@
 use crate::error::Error;
+use crate::frame::{CommandCode, MTFrame, MTHeader};
+use crate::subsystem::MTFramePayload;
 use crate::types::*;
 use bytes::{Buf, BufMut};
 use std::io::Cursor;
@@ -17,6 +19,22 @@ impl PingReq {
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u16_le(self.capabilities);
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::SYS,
+                    id: 0x01,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::SYS_PingReq_SRSP(self),
+        }
     }
 }
 
@@ -52,6 +70,22 @@ impl VersionReq {
         buffer.put_u8(self.minor);
         buffer.put_u8(self.maint);
     }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x05,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::SYS,
+                    id: 0x02,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::SYS_VersionReq_SRSP(self),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -67,6 +101,22 @@ impl NVCreateReq {
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::SYS,
+                    id: 0x30,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::SYS_NVCreateReq_SRSP(self),
+        }
     }
 }
 
@@ -84,6 +134,22 @@ impl NVDeleteReq {
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
     }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::SYS,
+                    id: 0x31,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::SYS_NVDeleteReq_SRSP(self),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -99,6 +165,22 @@ impl NVLengthReq {
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u32_le(self.length);
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x04,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::SYS,
+                    id: 0x32,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::SYS_NVLengthReq_SRSP(self),
+        }
     }
 }
 
@@ -131,6 +213,22 @@ impl NVReadReq {
         buffer.put_u8(self.length);
         buffer.extend(self.data.iter());
     }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x02 + self.data.len() as u8,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::SYS,
+                    id: 0x33,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::SYS_NVReadReq_SRSP(self),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -146,6 +244,22 @@ impl NVWriteReq {
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::SYS,
+                    id: 0x34,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::SYS_NVWriteReq_SRSP(self),
+        }
     }
 }
 
@@ -163,6 +277,22 @@ impl NVUpdateReq {
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
     }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::SYS,
+                    id: 0x35,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::SYS_NVUpdateReq_SRSP(self),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -178,5 +308,21 @@ impl NVCompactReq {
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::SYS,
+                    id: 0x36,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::SYS_NVCompactReq_SRSP(self),
+        }
     }
 }

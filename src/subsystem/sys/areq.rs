@@ -1,4 +1,6 @@
 use crate::error::Error;
+use crate::frame::{CommandCode, MTFrame, MTHeader};
+use crate::subsystem::MTFramePayload;
 use crate::types::*;
 use bytes::{Buf, BufMut};
 use std::io::Cursor;
@@ -17,6 +19,22 @@ impl ResetReq {
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.reset_type.encode_into(buffer);
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::AREQ,
+                    subsystem: MTSubsystem::SYS,
+                    id: 0x00,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::SYS_ResetReq_AREQ(self),
+        }
     }
 }
 
@@ -55,5 +73,21 @@ impl ResetInd {
         buffer.put_u8(self.major);
         buffer.put_u8(self.minor);
         buffer.put_u8(self.maint);
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x06,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::AREQ,
+                    subsystem: MTSubsystem::SYS,
+                    id: 0x80,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::SYS_ResetInd_AREQ(self),
+        }
     }
 }
