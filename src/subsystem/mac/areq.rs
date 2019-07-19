@@ -1,4 +1,6 @@
 use crate::error::Error;
+use crate::frame::{CommandCode, MTFrame, MTHeader};
+use crate::subsystem::MTFramePayload;
 use crate::types::*;
 use bytes::{Buf, BufMut};
 use std::io::Cursor;
@@ -52,6 +54,22 @@ impl DataCnf {
         buffer.put_u8(self.correlation);
         buffer.put_u8(self.rssi);
         buffer.put_u32_le(self.frame_counter);
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x10,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::AREQ,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x84,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_DataCnf_AREQ(self),
+        }
     }
 }
 
@@ -152,6 +170,22 @@ impl DataInd {
         buffer.extend(self.data_payload.iter());
         buffer.extend(self.ie_payload.iter());
     }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: (0x33 + self.data_payload.len() + self.ie_payload.len()) as u8,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::AREQ,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x85,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_DataInd_AREQ(self),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -170,6 +204,22 @@ impl PurgeCnf {
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
         buffer.put_u8(self.handle);
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x02,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::AREQ,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x90,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_PurgeCnf_AREQ(self),
+        }
     }
 }
 
@@ -274,6 +324,22 @@ impl WSAsyncInd {
         buffer.extend(self.data_payload.iter());
         buffer.extend(self.ie_payload.iter());
     }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: (0x34 + self.data_payload.len() + self.ie_payload.len()) as u8,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::AREQ,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x93,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_WSAsyncInd_AREQ(self),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -325,6 +391,22 @@ impl SyncLossInd {
         self.key_id_mode.encode_into(buffer);
         buffer.put_u8(self.key_index);
     }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x11,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::AREQ,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x80,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_SyncLossInd_AREQ(self),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -363,6 +445,22 @@ impl AssociateInd {
         self.security_level.encode_into(buffer);
         self.key_id_mode.encode_into(buffer);
         buffer.put_u8(self.key_index);
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x14,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::AREQ,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x81,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_AssociateInd_AREQ(self),
+        }
     }
 }
 
@@ -403,6 +501,22 @@ impl AssociateCnf {
         self.key_id_mode.encode_into(buffer);
         buffer.put_u8(self.key_index);
     }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x0e,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::AREQ,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x82,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_AssociateCnf_AREQ(self),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -436,6 +550,30 @@ impl BeaconNotifyInd {
                 buffer.put_u8(1);
                 frame.encode_into(buffer);
             }
+        }
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        use BeaconNotifyInd::*;
+        let length = match self {
+            StandardFrame(ref frame) => {
+                0x26 + (2 * frame.short_addr_list.len() + 8 * frame.ext_addr_list.len()) as u8
+                    + frame.sdu_length
+            }
+            EnhancedFrame(_) => 0x0a,
+        };
+        MTFrame {
+            header: MTHeader {
+                length,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::AREQ,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x83,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_BeaconNotifyInd_AREQ(self),
         }
     }
 }
@@ -641,6 +779,22 @@ impl DisassociateInd {
         self.key_id_mode.encode_into(buffer);
         buffer.put_u8(self.key_index);
     }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x14,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::AREQ,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x86,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_DisassociateInd_AREQ(self),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -667,6 +821,22 @@ impl DisassociateCnf {
         self.status.encode_into(buffer);
         self.device_addr.encode_into(buffer);
         buffer.put_u16_le(self.device_pan_id);
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x0c,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::AREQ,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x87,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_DisassociateCnf_AREQ(self),
+        }
     }
 }
 
@@ -702,6 +872,22 @@ impl OrphanInd {
         self.key_id_mode.encode_into(buffer);
         buffer.put_u8(self.key_index);
     }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x13,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::AREQ,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x8a,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_OrphanInd_AREQ(self),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -723,6 +909,22 @@ impl PollCnf {
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
         buffer.put_u8(if self.frame_pending { 1 } else { 0 });
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x02,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::AREQ,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x8b,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_PollCnf_AREQ(self),
+        }
     }
 }
 
@@ -749,6 +951,22 @@ impl PollInd {
         self.dev_addr.encode_into(buffer);
         buffer.put_u16_le(self.pan_id);
         buffer.put_u8(if self.no_response { 1 } else { 0 });
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x0c,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::AREQ,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x91,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_PollInd_AREQ(self),
+        }
     }
 }
 
@@ -796,6 +1014,22 @@ impl ScanCnf {
         self.unscanned_channels.encode_into(buffer);
         buffer.put_u8(self.result_list_count);
         buffer.extend(self.result_list.iter());
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x0c + self.result_list.len() as u8,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::AREQ,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x8c,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_ScanCnf_AREQ(self),
+        }
     }
 }
 
@@ -848,6 +1082,22 @@ impl CommStatusInd {
         self.key_id_mode.encode_into(buffer);
         buffer.put_u8(self.key_index);
     }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x21,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::AREQ,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x8d,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_CommStatusInd_AREQ(self),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -864,6 +1114,22 @@ impl StartCnf {
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
     }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::AREQ,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x8e,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_StartCnf_AREQ(self),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -879,5 +1145,21 @@ impl WSAsyncCnf {
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::AREQ,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x92,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_WSAsyncCnf_AREQ(self),
+        }
     }
 }
