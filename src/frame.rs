@@ -40,6 +40,20 @@ impl MTFrame {
 
         self.payload.encode_into(buffer);
     }
+
+    pub fn encode_to_uart_transport_frame(&self) -> Vec<u8> {
+        const START_OF_FRAME: u8 = 0xfe;
+        let mut buffer = Vec::new();
+        buffer.put_u8(START_OF_FRAME);
+        self.encode_into(&mut buffer);
+        let fcs = Self::compute_frame_check_sequence(&buffer[1..]);
+        buffer.put_u8(fcs);
+        buffer
+    }
+
+    pub fn compute_frame_check_sequence(mt_frame_bytes: &[u8]) -> u8 {
+        mt_frame_bytes.iter().fold(0, |acc, x| acc ^ x)
+    }
 }
 
 #[derive(Debug)]

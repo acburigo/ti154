@@ -48,7 +48,7 @@ impl Parser {
             }
 
             State::WaitingFrameCheckSequence => {
-                let fcs = Self::compute_frame_check_sequence(self.buffer.as_slice());
+                let fcs = MTFrame::compute_frame_check_sequence(self.buffer.as_slice());
 
                 let result = if fcs == new_byte {
                     self.parse_frame()
@@ -72,9 +72,5 @@ impl Parser {
     fn parse_frame(&self) -> Result<MTFrame, Error> {
         let mut cursor = Cursor::new(self.buffer.as_slice());
         MTFrame::try_decode(&mut cursor)
-    }
-
-    fn compute_frame_check_sequence(mt_frame_bytes: &[u8]) -> u8 {
-        mt_frame_bytes.iter().fold(0, |acc, x| acc ^ x)
     }
 }
