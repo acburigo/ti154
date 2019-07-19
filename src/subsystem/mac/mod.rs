@@ -31,9 +31,8 @@ pub fn try_decode(
             0x32 => sreq::UpdatePANIdReq::try_decode(cursor).map(|x| MAC_UpdatePANIdReq_SREQ(x)),
             0x33 => sreq::AddDeviceReq::try_decode(cursor).map(|x| MAC_AddDeviceReq_SREQ(x)),
             0x34 => sreq::DeleteDeviceReq::try_decode(cursor).map(|x| MAC_DeleteDeviceReq_SREQ(x)),
-            0x35 => {
-                sreq::DeleteAllDevicesReq::try_decode(cursor).map(|x| MAC_DeleteAllDevicesReq_SREQ(x))
-            }
+            0x35 => sreq::DeleteAllDevicesReq::try_decode(cursor)
+                .map(|x| MAC_DeleteAllDevicesReq_SREQ(x)),
             0x36 => sreq::DeleteKeyReq::try_decode(cursor).map(|x| MAC_DeleteKeyReq_SREQ(x)),
             0x37 => sreq::ReadKeyReq::try_decode(cursor).map(|x| MAC_ReadKeyReq_SREQ(x)),
             0x38 => sreq::WriteKeyReq::try_decode(cursor).map(|x| MAC_WriteKeyReq_SREQ(x)),
@@ -85,9 +84,8 @@ pub fn try_decode(
             0x32 => srsp::UpdatePANIdReq::try_decode(cursor).map(|x| MAC_UpdatePANIdReq_SRSP(x)),
             0x33 => srsp::AddDeviceReq::try_decode(cursor).map(|x| MAC_AddDeviceReq_SRSP(x)),
             0x34 => srsp::DeleteDeviceReq::try_decode(cursor).map(|x| MAC_DeleteDeviceReq_SRSP(x)),
-            0x35 => {
-                srsp::DeleteAllDevicesReq::try_decode(cursor).map(|x| MAC_DeleteAllDevicesReq_SRSP(x))
-            }
+            0x35 => srsp::DeleteAllDevicesReq::try_decode(cursor)
+                .map(|x| MAC_DeleteAllDevicesReq_SRSP(x)),
             0x36 => srsp::DeleteKeyReq::try_decode(cursor).map(|x| MAC_DeleteKeyReq_SRSP(x)),
             0x37 => srsp::ReadKeyReq::try_decode(cursor).map(|x| MAC_ReadKeyReq_SRSP(x)),
             0x38 => srsp::WriteKeyReq::try_decode(cursor).map(|x| MAC_WriteKeyReq_SRSP(x)),
