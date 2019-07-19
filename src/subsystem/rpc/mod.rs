@@ -1,7 +1,7 @@
 use crate::error::Error;
-use crate::frame::{CommandCode, MTExtendedHeader, MTHeader};
+use crate::frame::{CommandCode, MTExtendedHeader, MTFrame, MTHeader};
 use crate::subsystem::MTFramePayload;
-use crate::types::{CommandType, ErrorCode};
+use crate::types::{CommandType, ErrorCode, MTSubsystem};
 use std::io::Cursor;
 
 pub fn try_decode(
@@ -41,5 +41,21 @@ impl MTCommandError {
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.error_code.encode_into(buffer);
         self.command.encode_into(buffer);
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x03,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::RPC,
+                    id: 0x00,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::RPC_MTCommandError(self),
+        }
     }
 }
