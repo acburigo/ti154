@@ -1,4 +1,6 @@
 use crate::error::Error;
+use crate::frame::{CommandCode, MTFrame, MTHeader};
+use crate::subsystem::MTFramePayload;
 use crate::types::*;
 use bytes::{Buf, BufMut};
 use std::io::Cursor;
@@ -18,6 +20,22 @@ impl Init {
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
     }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x02,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_Init_SRSP(self),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -33,6 +51,22 @@ impl DataReq {
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x05,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_DataReq_SRSP(self),
+        }
     }
 }
 
@@ -50,6 +84,22 @@ impl PurgeReq {
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
     }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x0e,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_PurgeReq_SRSP(self),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -65,6 +115,22 @@ impl AssociateReq {
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x06,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_AssociateReq_SRSP(self),
+        }
     }
 }
 
@@ -82,6 +148,22 @@ impl AssociateRsp {
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
     }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x50,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_AssociateRsp_SRSP(self),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -97,6 +179,22 @@ impl DisassociateReq {
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x07,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_DisassociateReq_SRSP(self),
+        }
     }
 }
 
@@ -123,6 +221,22 @@ impl GetReq {
         self.status.encode_into(buffer);
         buffer.extend(self.data.iter().rev());
     }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x11,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x08,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_GetReq_SRSP(self),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -138,6 +252,22 @@ impl SetReq {
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x09,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_SetReq_SRSP(self),
+        }
     }
 }
 
@@ -174,6 +304,22 @@ impl SecurityGetReq {
         buffer.put_u8(self.index2);
         buffer.extend(self.data.iter());
     }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x03 + self.data.len() as u8,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x30,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_SecurityGetReq_SRSP(self),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -189,6 +335,22 @@ impl SecuritySetReq {
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x31,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_SecuritySetReq_SRSP(self),
+        }
     }
 }
 
@@ -206,6 +368,22 @@ impl UpdatePANIdReq {
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
     }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x32,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_UpdatePANIdReq_SRSP(self),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -221,6 +399,22 @@ impl AddDeviceReq {
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x33,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_AddDeviceReq_SRSP(self),
+        }
     }
 }
 
@@ -238,6 +432,22 @@ impl DeleteDeviceReq {
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
     }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x34,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_DeleteDeviceReq_SRSP(self),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -254,6 +464,22 @@ impl DeleteAllDevicesReq {
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
     }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x35,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_DeleteAllDevicesReq_SRSP(self),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -269,6 +495,22 @@ impl DeleteKeyReq {
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x36,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_DeleteKeyReq_SRSP(self),
+        }
     }
 }
 
@@ -292,6 +534,22 @@ impl ReadKeyReq {
         self.status.encode_into(buffer);
         buffer.put_u32_le(self.frame_counter);
     }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x05,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x37,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_ReadKeyReq_SRSP(self),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -307,6 +565,22 @@ impl WriteKeyReq {
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x38,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_WriteKeyReq_SRSP(self),
+        }
     }
 }
 
@@ -324,6 +598,22 @@ impl OrphanRsp {
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
     }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x51,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_OrphanRsp_SRSP(self),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -339,6 +629,22 @@ impl PollReq {
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x0d,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_PollReq_SRSP(self),
+        }
     }
 }
 
@@ -356,6 +662,22 @@ impl ResetReq {
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
     }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x01,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_ResetReq_SRSP(self),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -371,6 +693,22 @@ impl ScanReq {
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x0c,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_ScanReq_SRSP(self),
+        }
     }
 }
 
@@ -388,6 +726,22 @@ impl StartReq {
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
     }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x03,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_StartReq_SRSP(self),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -403,6 +757,22 @@ impl SyncReq {
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x04,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_SyncReq_SRSP(self),
+        }
     }
 }
 
@@ -420,6 +790,22 @@ impl SetRxGainReq {
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
     }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x0f,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_SetRxGainReq_SRSP(self),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -435,6 +821,22 @@ impl WSAsyncReq {
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x44,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_WSAsyncReq_SRSP(self),
+        }
     }
 }
 
@@ -452,6 +854,22 @@ impl FHEnableReq {
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
     }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x40,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_FHEnableReq_SRSP(self),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -467,6 +885,22 @@ impl FHStartReq {
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x41,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_FHStartReq_SRSP(self),
+        }
     }
 }
 
@@ -492,6 +926,22 @@ impl FHGetReq {
         self.status.encode_into(buffer);
         buffer.extend(self.data.iter());
     }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01 + self.data.len() as u8,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x42,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_FHGetReq_SRSP(self),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -507,5 +957,21 @@ impl FHSetReq {
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
+    }
+
+    pub fn into_mt_frame(self) -> MTFrame {
+        MTFrame {
+            header: MTHeader {
+                length: 0x01,
+                command: CommandCode {
+                    is_extended: false,
+                    cmd_type: CommandType::SRSP,
+                    subsystem: MTSubsystem::MAC,
+                    id: 0x43,
+                },
+            },
+            extended_header: None,
+            payload: MTFramePayload::MAC_FHSetReq_SRSP(self),
+        }
     }
 }
