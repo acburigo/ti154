@@ -1,7 +1,7 @@
 use crate::error::Error;
 use crate::subsystem::MTFramePayload;
 use crate::types::{CommandType, MTExtendedHeaderStatus, MTSubsystem};
-use bytes::Buf;
+use bytes::{Buf, BufMut};
 use num_traits::FromPrimitive;
 use std::io::Cursor;
 
@@ -30,6 +30,16 @@ impl MTFrame {
             payload,
         })
     }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        self.header.try_into(buffer);
+
+        if let Some(ref extended_header) = self.extended_header {
+            extended_header.try_into(buffer);
+        }
+
+        self.payload.try_into(buffer);
+    }
 }
 
 #[derive(Debug)]
@@ -46,13 +56,16 @@ impl MTHeader {
     pub fn has_extension(&self) -> bool {
         self.command.is_extended
     }
-}
 
-impl MTHeader {
     pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let length = cursor.get_u8();
         let command = CommandCode::try_from(cursor)?;
         Ok(MTHeader { length, command })
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(self.length);
+        self.command.try_into(buffer);
     }
 }
 
@@ -87,8 +100,17 @@ impl CommandCode {
         })
     }
 
-    pub fn try_into(&self, _buffer: &mut Vec<u8>) {
-        panic!("TODO");
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        let type_and_subsystem = {
+            let value = ((self.cmd_type as u8) << 5) & (self.subsystem as u8);
+            if self.is_extended {
+                0x80 | value
+            } else {
+                value
+            }
+        };
+        buffer.put_u8(type_and_subsystem);
+        buffer.put_u8(self.id);
     }
 }
 
@@ -136,9 +158,7 @@ impl MTExtendedHeader {
         }
 
         if version == 3 || version == 4 {
-            let status = cursor.get_u8();
-            let status =
-                FromPrimitive::from_u8(status).ok_or(Error::InvalidExtendedHeaderStatus(status))?;
+            let status = MTExtendedHeaderStatus::try_from(cursor)?;
 
             if version == 3 {
                 return Ok(MTExtendedHeader::V3 {
@@ -156,5 +176,44 @@ impl MTExtendedHeader {
         }
 
         Err(Error::NotImplemented)
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        match self {
+            MTExtendedHeader::V1 { stack_id } => {
+                let version_and_stack_id = (1 << 3) | stack_id;
+                buffer.put_u8(version_and_stack_id);
+            }
+            MTExtendedHeader::V2 {
+                stack_id,
+                block,
+                packet_length,
+            } => {
+                let version_and_stack_id = (2 << 3) | stack_id;
+                buffer.put_u8(version_and_stack_id);
+                buffer.put_u8(*block);
+                buffer.put_u16_le(*packet_length);
+            }
+            MTExtendedHeader::V3 {
+                stack_id,
+                block,
+                status,
+            } => {
+                let version_and_stack_id = (3 << 3) | stack_id;
+                buffer.put_u8(version_and_stack_id);
+                buffer.put_u8(*block);
+                status.try_into(buffer);
+            }
+            MTExtendedHeader::V4 {
+                stack_id,
+                block,
+                status,
+            } => {
+                let version_and_stack_id = (4 << 3) | stack_id;
+                buffer.put_u8(version_and_stack_id);
+                buffer.put_u8(*block);
+                status.try_into(buffer);
+            }
+        }
     }
 }

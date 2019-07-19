@@ -5,7 +5,7 @@ use num_traits::FromPrimitive;
 use std::io::Cursor;
 use std::io::Read;
 
-#[derive(Debug, FromPrimitive, PartialEq)]
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
 pub enum CommandType {
     POLL = 0,
     SREQ = 1,
@@ -13,7 +13,7 @@ pub enum CommandType {
     SRSP = 3,
 }
 
-#[derive(Debug, FromPrimitive, PartialEq)]
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
 pub enum MTExtendedHeaderStatus {
     Success = 0,                           // Success
     ResendLastFrame = 1,                   // Request - resend last frame
@@ -26,7 +26,18 @@ pub enum MTExtendedHeaderStatus {
     UnsupportedFragmentationAckStatus = 8, // Unsupported Fragmentation Ack Status
 }
 
-#[derive(Debug, FromPrimitive, PartialEq)]
+impl MTExtendedHeaderStatus {
+    pub fn try_from(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+        let value = cursor.get_u8();
+        FromPrimitive::from_u8(value).ok_or(Error::InvalidExtendedHeaderStatus(value))
+    }
+
+    pub fn try_into(&self, buffer: &mut Vec<u8>) {
+        buffer.put_u8(*self as u8);
+    }
+}
+
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
 pub enum MTSubsystem {
     RPC = 0,
     SYS = 1,
