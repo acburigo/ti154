@@ -1,7 +1,8 @@
 use crate::error::Error;
 use crate::frame::{CommandCode, MTExtendedHeader, MTFrame, MTHeader};
 use crate::subsystem::MTFramePayload;
-use crate::types::{CommandType, ErrorCode, MTSubsystem};
+use crate::types::{CommandType, ErrorCode, MTSubsystem, RPCCommandId};
+use num_traits::FromPrimitive;
 use std::io::Cursor;
 
 pub fn try_decode(
@@ -11,13 +12,17 @@ pub fn try_decode(
 ) -> Result<MTFramePayload, Error> {
     use MTFramePayload::*;
 
+    let command_id =
+        FromPrimitive::from_u8(header.command.id).ok_or(Error::InvalidStatus(header.command.id))?;
+
     match header.command.cmd_type {
         CommandType::POLL => Err(Error::NotImplemented),
         CommandType::SREQ => Err(Error::NotImplemented),
         CommandType::AREQ => Err(Error::NotImplemented),
-        CommandType::SRSP => match header.command.id {
-            0x00 => MTCommandError::try_decode(cursor).map(|x| RPC_MTCommandError(x)),
-            _ => Err(Error::NotImplemented),
+        CommandType::SRSP => match command_id {
+            RPCCommandId::MTCommandError => {
+                MTCommandError::try_decode(cursor).map(|x| RPC_MTCommandError(x))
+            }
         },
     }
 }
@@ -51,7 +56,7 @@ impl MTCommandError {
                     is_extended: false,
                     cmd_type: CommandType::SRSP,
                     subsystem: MTSubsystem::RPC,
-                    id: 0x00,
+                    id: RPCCommandId::MTCommandError as u8,
                 },
             },
             extended_header: None,

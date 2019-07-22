@@ -5,6 +5,88 @@ use num_traits::FromPrimitive;
 use std::io::Cursor;
 use std::io::Read;
 
+#[allow(non_camel_case_types)]
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
+pub enum MACCommandId {
+    DataCnf = 0x84,
+    DataInd = 0x85,
+    PurgeCnf = 0x90,
+    WSAsyncInd = 0x93,
+    SyncLossInd = 0x80,
+    AssociateInd = 0x81,
+    AssociateCnf = 0x82,
+    BeaconNotifyInd = 0x83,
+    DisassociateInd = 0x86,
+    DisassociateCnf = 0x87,
+    OrphanInd = 0x8a,
+    PollCnf = 0x8b,
+    PollInd = 0x91,
+    ScanCnf = 0x8c,
+    CommStatusInd = 0x8d,
+    StartCnf = 0x8e,
+    WSAsyncCnf = 0x92,
+    Init = 0x02,
+    DataReq = 0x05,
+    PurgeReq = 0x0e,
+    AssociateReq = 0x06,
+    AssociateRsp = 0x50,
+    DisassociateReq = 0x07,
+    GetReq = 0x08,
+    SetReq = 0x09,
+    SecurityGetReq = 0x30,
+    SecuritySetReq = 0x31,
+    UpdatePANIdReq = 0x32,
+    AddDeviceReq = 0x33,
+    DeleteDeviceReq = 0x34,
+    DeleteAllDevicesReq = 0x35,
+    DeleteKeyReq = 0x36,
+    ReadKeyReq = 0x37,
+    WriteKeyReq = 0x38,
+    OrphanRsp = 0x51,
+    PollReq = 0x0d,
+    ResetReq = 0x01,
+    ScanReq = 0x0c,
+    StartReq = 0x03,
+    SyncReq = 0x04,
+    SetRxGainReq = 0x0f,
+    WSAsyncReq = 0x44,
+    FHEnableReq = 0x40,
+    FHStartReq = 0x41,
+    FHGetReq = 0x42,
+    FHSetReq = 0x43,
+}
+
+#[allow(non_camel_case_types)]
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
+pub enum RPCCommandId {
+    MTCommandError = 0x00,
+}
+
+#[allow(non_camel_case_types)]
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
+pub enum SYSCommandId {
+    ResetReq = 0x00,
+    ResetInd = 0x80,
+    PingReq = 0x01,
+    VersionReq = 0x02,
+    NVCreateReq = 0x30,
+    NVDeleteReq = 0x31,
+    NVLengthReq = 0x32,
+    NVReadReq = 0x33,
+    NVWriteReq = 0x34,
+    NVUpdateReq = 0x35,
+    NVCompactReq = 0x36,
+}
+
+#[allow(non_camel_case_types)]
+#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
+pub enum UTILCommandId {
+    Loopback = 0x10,
+    CallbackSubCmd = 0x06,
+    GetExtAddr = 0xee,
+    Random = 0x12,
+}
+
 #[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
 pub enum CommandType {
     POLL = 0,

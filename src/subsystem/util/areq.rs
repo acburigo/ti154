@@ -1,7 +1,7 @@
 use crate::error::Error;
 use crate::frame::{CommandCode, MTFrame, MTHeader};
 use crate::subsystem::MTFramePayload;
-use crate::types::{CommandType, MTSubsystem};
+use crate::types::{CommandType, MTSubsystem, UTILCommandId};
 use bytes::{Buf, BufMut};
 use std::io::Cursor;
 use std::io::Read;
@@ -44,7 +44,7 @@ impl Loopback {
                     is_extended: false,
                     cmd_type: CommandType::AREQ,
                     subsystem: MTSubsystem::UTIL,
-                    id: 0x10,
+                    id: UTILCommandId::Loopback as u8,
                 },
             },
             extended_header: None,

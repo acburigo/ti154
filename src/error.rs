@@ -4,6 +4,7 @@ pub enum Error {
     InvalidFrameCheckSequence(Vec<u8>),
     InvalidCommandType(u8),
     InvalidSubsystem(u8),
+    InvalidCommandId(u8),
     InvalidExtendedHeaderStatus(u8),
     InvalidErrorCode(u8),
     InvalidAddressMode(u8),

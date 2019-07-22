@@ -1,7 +1,7 @@
 use crate::error::Error;
 use crate::frame::{CommandCode, MTFrame, MTHeader};
 use crate::subsystem::MTFramePayload;
-use crate::types::{CommandType, MTSubsystem};
+use crate::types::{CommandType, MTSubsystem, SYSCommandId};
 use bytes::{Buf, BufMut};
 use std::io::Cursor;
 use std::io::Read;
@@ -24,7 +24,7 @@ impl PingReq {
                     is_extended: false,
                     cmd_type: CommandType::SREQ,
                     subsystem: MTSubsystem::SYS,
-                    id: 0x01,
+                    id: SYSCommandId::PingReq as u8,
                 },
             },
             extended_header: None,
@@ -51,7 +51,7 @@ impl VersionReq {
                     is_extended: false,
                     cmd_type: CommandType::SREQ,
                     subsystem: MTSubsystem::SYS,
-                    id: 0x02,
+                    id: SYSCommandId::VersionReq as u8,
                 },
             },
             extended_header: None,
@@ -97,7 +97,7 @@ impl NVCreateReq {
                     is_extended: false,
                     cmd_type: CommandType::SREQ,
                     subsystem: MTSubsystem::SYS,
-                    id: 0x30,
+                    id: SYSCommandId::NVCreateReq as u8,
                 },
             },
             extended_header: None,
@@ -139,7 +139,7 @@ impl NVDeleteReq {
                     is_extended: false,
                     cmd_type: CommandType::SREQ,
                     subsystem: MTSubsystem::SYS,
-                    id: 0x31,
+                    id: SYSCommandId::NVDeleteReq as u8,
                 },
             },
             extended_header: None,
@@ -181,7 +181,7 @@ impl NVLengthReq {
                     is_extended: false,
                     cmd_type: CommandType::SREQ,
                     subsystem: MTSubsystem::SYS,
-                    id: 0x32,
+                    id: SYSCommandId::NVLengthReq as u8,
                 },
             },
             extended_header: None,
@@ -231,7 +231,7 @@ impl NVReadReq {
                     is_extended: false,
                     cmd_type: CommandType::SREQ,
                     subsystem: MTSubsystem::SYS,
-                    id: 0x33,
+                    id: SYSCommandId::NVReadReq as u8,
                 },
             },
             extended_header: None,
@@ -290,7 +290,7 @@ impl NVWriteReq {
                     is_extended: false,
                     cmd_type: CommandType::SREQ,
                     subsystem: MTSubsystem::SYS,
-                    id: 0x34,
+                    id: SYSCommandId::NVWriteReq as u8,
                 },
             },
             extended_header: None,
@@ -345,7 +345,7 @@ impl NVUpdateReq {
                     is_extended: false,
                     cmd_type: CommandType::SREQ,
                     subsystem: MTSubsystem::SYS,
-                    id: 0x35,
+                    id: SYSCommandId::NVUpdateReq as u8,
                 },
             },
             extended_header: None,
@@ -377,7 +377,7 @@ impl NVCompactReq {
                     is_extended: false,
                     cmd_type: CommandType::SREQ,
                     subsystem: MTSubsystem::SYS,
-                    id: 0x36,
+                    id: SYSCommandId::NVCompactReq as u8,
                 },
             },
             extended_header: None,
