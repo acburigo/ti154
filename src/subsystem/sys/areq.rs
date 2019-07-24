@@ -1,6 +1,5 @@
 use crate::error::Error;
 use crate::frame::{CommandCode, MTFrame, MTHeader};
-use crate::subsystem::MTFramePayload;
 use crate::types::*;
 use bytes::{Buf, BufMut};
 use std::io::Cursor;
@@ -15,6 +14,12 @@ impl ResetReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let reset_type = ResetType::try_decode(Read::by_ref(cursor))?;
         Ok(ResetReq { reset_type })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -33,7 +38,7 @@ impl ResetReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::SYS_ResetReq_AREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -66,6 +71,12 @@ impl ResetInd {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.reason.encode_into(buffer);
         self.transport.encode_into(buffer);
@@ -87,7 +98,7 @@ impl ResetInd {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::SYS_ResetInd_AREQ(self),
+            payload: self.encode(),
         }
     }
 }

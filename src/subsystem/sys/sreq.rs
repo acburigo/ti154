@@ -1,6 +1,5 @@
 use crate::error::Error;
 use crate::frame::{CommandCode, MTFrame, MTHeader};
-use crate::subsystem::MTFramePayload;
 use crate::types::{CommandType, MTSubsystem, SYSCommandId};
 use bytes::{Buf, BufMut};
 use std::io::Cursor;
@@ -12,6 +11,12 @@ pub struct PingReq {}
 impl PingReq {
     pub fn try_decode(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         Ok(PingReq {})
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, _: &mut Vec<u8>) {}
@@ -28,7 +33,7 @@ impl PingReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::SYS_PingReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -39,6 +44,12 @@ pub struct VersionReq {}
 impl VersionReq {
     pub fn try_decode(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         Ok(VersionReq {})
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, _: &mut Vec<u8>) {}
@@ -55,7 +66,7 @@ impl VersionReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::SYS_VersionReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -82,6 +93,12 @@ impl NVCreateReq {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(self.sys_id);
         buffer.put_u16_le(self.item_id);
@@ -101,7 +118,7 @@ impl NVCreateReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::SYS_NVCreateReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -125,6 +142,12 @@ impl NVDeleteReq {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(self.sys_id);
         buffer.put_u16_le(self.item_id);
@@ -143,7 +166,7 @@ impl NVDeleteReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::SYS_NVDeleteReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -167,6 +190,12 @@ impl NVLengthReq {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(self.sys_id);
         buffer.put_u16_le(self.item_id);
@@ -185,7 +214,7 @@ impl NVLengthReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::SYS_NVLengthReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -215,6 +244,12 @@ impl NVReadReq {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(self.sys_id);
         buffer.put_u16_le(self.item_id);
@@ -235,7 +270,7 @@ impl NVReadReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::SYS_NVReadReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -273,6 +308,12 @@ impl NVWriteReq {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(self.sys_id);
         buffer.put_u16_le(self.item_id);
@@ -294,7 +335,7 @@ impl NVWriteReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::SYS_NVWriteReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -329,6 +370,12 @@ impl NVUpdateReq {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(self.sys_id);
         buffer.put_u16_le(self.item_id);
@@ -349,7 +396,7 @@ impl NVUpdateReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::SYS_NVUpdateReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -363,6 +410,12 @@ impl NVCompactReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let threshold = cursor.get_u16_le();
         Ok(NVCompactReq { threshold })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -381,7 +434,7 @@ impl NVCompactReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::SYS_NVCompactReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }

@@ -43,6 +43,12 @@ impl MTCommandError {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.error_code.encode_into(buffer);
         self.command.encode_into(buffer);
@@ -60,7 +66,7 @@ impl MTCommandError {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::RPC_MTCommandError(self),
+            payload: self.encode(),
         }
     }
 }

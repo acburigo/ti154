@@ -1,6 +1,5 @@
 use crate::error::Error;
 use crate::frame::{CommandCode, MTFrame, MTHeader};
-use crate::subsystem::MTFramePayload;
 use crate::types::{CommandType, MTSubsystem, UTILCommandId};
 use bytes::{Buf, BufMut};
 use std::io::Cursor;
@@ -30,6 +29,12 @@ impl Loopback {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(self.repeats);
         buffer.put_u32_le(self.interval);
@@ -48,7 +53,7 @@ impl Loopback {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::UTIL_Loopback_AREQ(self),
+            payload: self.encode(),
         }
     }
 }

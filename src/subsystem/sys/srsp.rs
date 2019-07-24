@@ -1,6 +1,5 @@
 use crate::error::Error;
 use crate::frame::{CommandCode, MTFrame, MTHeader};
-use crate::subsystem::MTFramePayload;
 use crate::types::*;
 use bytes::{Buf, BufMut};
 use std::io::Cursor;
@@ -15,6 +14,12 @@ impl PingReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let capabilities = cursor.get_u16_le();
         Ok(PingReq { capabilities })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -33,7 +38,7 @@ impl PingReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::SYS_PingReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -63,6 +68,12 @@ impl VersionReq {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.transport.encode_into(buffer);
         self.product.encode_into(buffer);
@@ -83,7 +94,7 @@ impl VersionReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::SYS_VersionReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -97,6 +108,12 @@ impl NVCreateReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(NVCreateReq { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -115,7 +132,7 @@ impl NVCreateReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::SYS_NVCreateReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -129,6 +146,12 @@ impl NVDeleteReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(NVDeleteReq { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -147,7 +170,7 @@ impl NVDeleteReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::SYS_NVDeleteReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -161,6 +184,12 @@ impl NVLengthReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let length = cursor.get_u32_le();
         Ok(NVLengthReq { length })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -179,7 +208,7 @@ impl NVLengthReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::SYS_NVLengthReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -208,6 +237,12 @@ impl NVReadReq {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
         buffer.put_u8(self.length);
@@ -226,7 +261,7 @@ impl NVReadReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::SYS_NVReadReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -240,6 +275,12 @@ impl NVWriteReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(NVWriteReq { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -258,7 +299,7 @@ impl NVWriteReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::SYS_NVWriteReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -272,6 +313,12 @@ impl NVUpdateReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(NVUpdateReq { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -290,7 +337,7 @@ impl NVUpdateReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::SYS_NVUpdateReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -304,6 +351,12 @@ impl NVCompactReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(NVCompactReq { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -322,7 +375,7 @@ impl NVCompactReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::SYS_NVCompactReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }

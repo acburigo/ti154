@@ -1,6 +1,5 @@
 use crate::error::Error;
 use crate::frame::{CommandCode, MTFrame, MTHeader};
-use crate::subsystem::MTFramePayload;
 use crate::types::*;
 use bytes::{Buf, BufMut};
 use std::io::Cursor;
@@ -44,6 +43,12 @@ impl DataCnf {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
         buffer.put_u8(self.handle);
@@ -68,7 +73,7 @@ impl DataCnf {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_DataCnf_AREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -83,7 +88,7 @@ pub struct DataInd {
     pub dest_pan_id: u16,
     pub link_quality: u8,
     pub correlation: u8,
-    pub rssi: u8,
+    pub rssi: i8,
     pub dsn: u8,
     pub key_source: KeySource,
     pub security_level: SecurityLevel,
@@ -106,7 +111,7 @@ impl DataInd {
         let dest_pan_id = cursor.get_u16_le();
         let link_quality = cursor.get_u8();
         let correlation = cursor.get_u8();
-        let rssi = cursor.get_u8();
+        let rssi = cursor.get_i8();
         let dsn = cursor.get_u8();
         let key_source = KeySource::try_decode(Read::by_ref(cursor))?;
         let security_level = SecurityLevel::try_decode(Read::by_ref(cursor))?;
@@ -121,7 +126,7 @@ impl DataInd {
             .read_exact(&mut data_payload)
             .map_err(|_| Error::NotEnoughBytes)?;
 
-        let mut ie_payload = vec![0x00; data_length as usize];
+        let mut ie_payload = vec![0x00; ie_length as usize];
         cursor
             .read_exact(&mut ie_payload)
             .map_err(|_| Error::NotEnoughBytes)?;
@@ -149,6 +154,12 @@ impl DataInd {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.src_address.encode_into(buffer);
         self.dest_address.encode_into(buffer);
@@ -158,7 +169,7 @@ impl DataInd {
         buffer.put_u16_le(self.dest_pan_id);
         buffer.put_u8(self.link_quality);
         buffer.put_u8(self.correlation);
-        buffer.put_u8(self.rssi);
+        buffer.put_i8(self.rssi);
         buffer.put_u8(self.dsn);
         self.key_source.encode_into(buffer);
         self.security_level.encode_into(buffer);
@@ -183,7 +194,7 @@ impl DataInd {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_DataInd_AREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -199,6 +210,12 @@ impl PurgeCnf {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         let handle = cursor.get_u8();
         Ok(PurgeCnf { status, handle })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -218,7 +235,7 @@ impl PurgeCnf {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_PurgeCnf_AREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -302,6 +319,12 @@ impl WSAsyncInd {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.src_address.encode_into(buffer);
         self.dest_address.encode_into(buffer);
@@ -337,7 +360,7 @@ impl WSAsyncInd {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_WSAsyncInd_AREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -380,6 +403,12 @@ impl SyncLossInd {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
         buffer.put_u16_le(self.pan_id);
@@ -404,7 +433,7 @@ impl SyncLossInd {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_SyncLossInd_AREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -438,6 +467,12 @@ impl AssociateInd {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.extended_address.encode_into(buffer);
         buffer.put_u8(self.capabilities);
@@ -459,7 +494,7 @@ impl AssociateInd {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_AssociateInd_AREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -493,6 +528,12 @@ impl AssociateCnf {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
         self.short_address.encode_into(buffer);
@@ -514,7 +555,7 @@ impl AssociateCnf {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_AssociateCnf_AREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -538,6 +579,12 @@ impl BeaconNotifyInd {
         };
 
         Ok(beacon_frame)
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -573,7 +620,7 @@ impl BeaconNotifyInd {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_BeaconNotifyInd_AREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -664,6 +711,12 @@ impl StandardBeaconFrame {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(self.bsn);
         buffer.put_u32_le(self.timestamp);
@@ -730,6 +783,12 @@ impl EnhancedBeaconFrame {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(self.bsn);
         buffer.put_u8(self.beacon_order);
@@ -771,6 +830,12 @@ impl DisassociateInd {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.extended_address.encode_into(buffer);
         self.disassociate_reason.encode_into(buffer);
@@ -792,7 +857,7 @@ impl DisassociateInd {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_DisassociateInd_AREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -817,6 +882,12 @@ impl DisassociateCnf {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
         self.device_addr.encode_into(buffer);
@@ -835,7 +906,7 @@ impl DisassociateCnf {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_DisassociateCnf_AREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -865,6 +936,12 @@ impl OrphanInd {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.extended_address.encode_into(buffer);
         self.key_source.encode_into(buffer);
@@ -885,7 +962,7 @@ impl OrphanInd {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_OrphanInd_AREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -906,6 +983,12 @@ impl PollCnf {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
         buffer.put_u8(if self.frame_pending { 1 } else { 0 });
@@ -923,7 +1006,7 @@ impl PollCnf {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_PollCnf_AREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -947,6 +1030,12 @@ impl PollInd {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.dev_addr.encode_into(buffer);
         buffer.put_u16_le(self.pan_id);
@@ -965,7 +1054,7 @@ impl PollInd {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_PollInd_AREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -1006,6 +1095,12 @@ impl ScanCnf {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
         self.scan_type.encode_into(buffer);
@@ -1028,7 +1123,7 @@ impl ScanCnf {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_ScanCnf_AREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -1071,6 +1166,12 @@ impl CommStatusInd {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
         self.src_addr.encode_into(buffer);
@@ -1095,7 +1196,7 @@ impl CommStatusInd {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_CommStatusInd_AREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -1109,6 +1210,12 @@ impl StartCnf {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(StartCnf { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -1127,7 +1234,7 @@ impl StartCnf {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_StartCnf_AREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -1141,6 +1248,12 @@ impl WSAsyncCnf {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(WSAsyncCnf { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -1159,7 +1272,7 @@ impl WSAsyncCnf {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_WSAsyncCnf_AREQ(self),
+            payload: self.encode(),
         }
     }
 }

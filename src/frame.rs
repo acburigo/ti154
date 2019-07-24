@@ -1,28 +1,30 @@
 use crate::error::Error;
-use crate::subsystem::MTFramePayload;
 use crate::types::{CommandType, MTExtendedHeaderStatus, MTSubsystem};
 use bytes::{Buf, BufMut};
 use num_traits::FromPrimitive;
-use std::io::Cursor;
+use std::io::{Cursor, Read};
 
 #[derive(Debug)]
 pub struct MTFrame {
     pub header: MTHeader,
     pub extended_header: Option<MTExtendedHeader>,
-    pub payload: MTFramePayload,
+    pub payload: Vec<u8>,
 }
 
 impl MTFrame {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let header = MTHeader::try_decode(cursor.by_ref())?;
+        let header = MTHeader::try_decode(Read::by_ref(cursor))?;
 
         let extended_header = if header.has_extension() {
-            Some(MTExtendedHeader::try_decode(cursor.by_ref())?)
+            Some(MTExtendedHeader::try_decode(Read::by_ref(cursor))?)
         } else {
             None
         };
 
-        let payload = MTFramePayload::try_decode(&header, &extended_header, cursor.by_ref())?;
+        let mut payload = Vec::new();
+        cursor
+            .read_to_end(&mut payload)
+            .map_err(|_| Error::NotEnoughBytes)?;
 
         Ok(MTFrame {
             header,
@@ -38,7 +40,7 @@ impl MTFrame {
             extended_header.encode_into(buffer);
         }
 
-        self.payload.encode_into(buffer);
+        buffer.extend(self.payload.iter());
     }
 
     pub fn encode_to_uart_transport_frame(&self) -> Vec<u8> {

@@ -1,6 +1,5 @@
 use crate::error::Error;
 use crate::frame::{CommandCode, MTFrame, MTHeader};
-use crate::subsystem::MTFramePayload;
 use crate::types::*;
 use bytes::{Buf, BufMut};
 use std::io::Cursor;
@@ -17,6 +16,12 @@ impl CallbackSubCmd {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         let enables = cursor.get_u32_le();
         Ok(CallbackSubCmd { status, enables })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -36,7 +41,7 @@ impl CallbackSubCmd {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::UTIL_CallbackSubCmd_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -57,6 +62,12 @@ impl GetExtAddr {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.address_type.encode_into(buffer);
         self.ext_address.encode_into(buffer);
@@ -74,7 +85,7 @@ impl GetExtAddr {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::UTIL_GetExtAddr_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -103,6 +114,12 @@ impl Loopback {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(self.repeats);
         buffer.put_u32_le(self.interval);
@@ -121,7 +138,7 @@ impl Loopback {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::UTIL_Loopback_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -135,6 +152,12 @@ impl Random {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let number = cursor.get_u16_le();
         Ok(Random { number })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -153,7 +176,7 @@ impl Random {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::UTIL_Random_SRSP(self),
+            payload: self.encode(),
         }
     }
 }

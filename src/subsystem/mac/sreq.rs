@@ -1,6 +1,5 @@
 use crate::error::Error;
 use crate::frame::{CommandCode, MTFrame, MTHeader};
-use crate::subsystem::MTFramePayload;
 use crate::types::*;
 use bytes::{Buf, BufMut};
 use std::io::Cursor;
@@ -12,6 +11,12 @@ pub struct Init {}
 impl Init {
     pub fn try_decode(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         Ok(Init {})
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, _: &mut Vec<u8>) {}
@@ -28,7 +33,7 @@ impl Init {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_Init_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -100,6 +105,12 @@ impl DataReq {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.dest_address.encode_into(buffer);
         buffer.put_u16_le(self.dest_pan_id);
@@ -131,7 +142,7 @@ impl DataReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_DataReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -145,6 +156,12 @@ impl PurgeReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let handle = cursor.get_u8();
         Ok(PurgeReq { handle })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -163,7 +180,7 @@ impl PurgeReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_PurgeReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -208,6 +225,12 @@ impl AssociateReq {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(self.logical_channel);
         buffer.put_u8(self.channel_page);
@@ -233,7 +256,7 @@ impl AssociateReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_AssociateReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -269,6 +292,12 @@ impl AssociateRsp {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.extended_address.encode_into(buffer);
         self.assoc_short_address.encode_into(buffer);
@@ -291,7 +320,7 @@ impl AssociateRsp {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_AssociateRsp_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -330,6 +359,12 @@ impl DisassociateReq {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.device_address.encode_into(buffer);
         buffer.put_u16_le(self.device_pan_id);
@@ -353,7 +388,7 @@ impl DisassociateReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_DisassociateReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -367,6 +402,12 @@ impl GetReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let attribute_id = MACPIBAttributeId::try_decode(Read::by_ref(cursor))?;
         Ok(GetReq { attribute_id })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -385,7 +426,7 @@ impl GetReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_GetReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -412,6 +453,12 @@ impl SetReq {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.attribute_id.encode_into(buffer);
         buffer.extend(self.attribute_value.iter().rev());
@@ -429,7 +476,7 @@ impl SetReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_SetReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -454,6 +501,12 @@ impl SecurityGetReq {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.attribute_id.encode_into(buffer);
         buffer.put_u8(self.index1);
@@ -472,7 +525,7 @@ impl SecurityGetReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_SecurityGetReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -504,6 +557,12 @@ impl SecuritySetReq {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.attribute_id.encode_into(buffer);
         buffer.put_u8(self.index1);
@@ -523,7 +582,7 @@ impl SecuritySetReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_SecuritySetReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -537,6 +596,12 @@ impl UpdatePANIdReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let pan_id = cursor.get_u16_le();
         Ok(UpdatePANIdReq { pan_id })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -555,7 +620,7 @@ impl UpdatePANIdReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_UpdatePANIdReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -603,6 +668,12 @@ impl AddDeviceReq {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u16_le(self.pan_id);
         self.short_addr.encode_into(buffer);
@@ -627,7 +698,7 @@ impl AddDeviceReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_AddDeviceReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -641,6 +712,12 @@ impl DeleteDeviceReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let ext_addr = ExtendedAddress::try_decode(Read::by_ref(cursor))?;
         Ok(DeleteDeviceReq { ext_addr })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -659,7 +736,7 @@ impl DeleteDeviceReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_DeleteDeviceReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -670,6 +747,12 @@ pub struct DeleteAllDevicesReq {}
 impl DeleteAllDevicesReq {
     pub fn try_decode(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         Ok(DeleteAllDevicesReq {})
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, _: &mut Vec<u8>) {}
@@ -686,7 +769,7 @@ impl DeleteAllDevicesReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_DeleteAllDevicesReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -700,6 +783,12 @@ impl DeleteKeyReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let index = cursor.get_u8();
         Ok(DeleteKeyReq { index })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -718,7 +807,7 @@ impl DeleteKeyReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_DeleteKeyReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -732,6 +821,12 @@ impl ReadKeyReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let index = cursor.get_u8();
         Ok(ReadKeyReq { index })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -750,7 +845,7 @@ impl ReadKeyReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_ReadKeyReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -795,6 +890,12 @@ impl WriteKeyReq {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(if self.new { 1 } else { 0 });
         buffer.put_u16_le(self.index);
@@ -816,7 +917,7 @@ impl WriteKeyReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_WriteKeyReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -852,6 +953,12 @@ impl OrphanRsp {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.extended_address.encode_into(buffer);
         self.assoc_short_address.encode_into(buffer);
@@ -874,7 +981,7 @@ impl OrphanRsp {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_OrphanRsp_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -907,6 +1014,12 @@ impl PollReq {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.coord_address.encode_into(buffer);
         buffer.put_u16_le(self.coord_pan_id);
@@ -928,7 +1041,7 @@ impl PollReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_PollReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -942,6 +1055,12 @@ impl ResetReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let set_default = cursor.get_u8() != 0;
         Ok(ResetReq { set_default })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -960,7 +1079,7 @@ impl ResetReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_ResetReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -1023,6 +1142,12 @@ impl ScanReq {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.scan_type.encode_into(buffer);
         buffer.put_u8(self.scan_duration);
@@ -1054,7 +1179,7 @@ impl ScanReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_ScanReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -1146,6 +1271,12 @@ impl StartReq {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u32_le(self.start_time);
         buffer.put_u16_le(self.pan_id);
@@ -1185,7 +1316,7 @@ impl StartReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_StartReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -1212,6 +1343,12 @@ impl SyncReq {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(self.logical_channel);
         buffer.put_u8(self.channel_page);
@@ -1231,7 +1368,7 @@ impl SyncReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_SyncReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -1245,6 +1382,12 @@ impl SetRxGainReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let mode = cursor.get_u8() != 0;
         Ok(SetRxGainReq { mode })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -1263,7 +1406,7 @@ impl SetRxGainReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_SetRxGainReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -1299,6 +1442,12 @@ impl WSAsyncReq {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.operation.encode_into(buffer);
         self.frame_type.encode_into(buffer);
@@ -1321,7 +1470,7 @@ impl WSAsyncReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_WSAsyncReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -1332,6 +1481,12 @@ pub struct FHEnableReq {}
 impl FHEnableReq {
     pub fn try_decode(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         Ok(FHEnableReq {})
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, _: &mut Vec<u8>) {}
@@ -1348,7 +1503,7 @@ impl FHEnableReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_FHEnableReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -1359,6 +1514,12 @@ pub struct FHStartReq {}
 impl FHStartReq {
     pub fn try_decode(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         Ok(FHStartReq {})
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, _: &mut Vec<u8>) {}
@@ -1375,7 +1536,7 @@ impl FHStartReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_FHStartReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -1389,6 +1550,12 @@ impl FHGetReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let attribute_id = FHPIBAttributeId::try_decode(Read::by_ref(cursor))?;
         Ok(FHGetReq { attribute_id })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -1407,7 +1574,7 @@ impl FHGetReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_FHGetReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -1430,6 +1597,12 @@ impl FHSetReq {
         Ok(FHSetReq { attribute_id, data })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.attribute_id.encode_into(buffer);
         buffer.extend(self.data.iter());
@@ -1447,7 +1620,7 @@ impl FHSetReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_FHSetReq_SREQ(self),
+            payload: self.encode(),
         }
     }
 }

@@ -1,6 +1,5 @@
 use crate::error::Error;
 use crate::frame::{CommandCode, MTFrame, MTHeader};
-use crate::subsystem::MTFramePayload;
 use crate::types::*;
 use bytes::{Buf, BufMut};
 use std::io::Cursor;
@@ -15,6 +14,12 @@ impl Init {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(Init { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -33,7 +38,7 @@ impl Init {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_Init_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -47,6 +52,12 @@ impl DataReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(DataReq { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -65,7 +76,7 @@ impl DataReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_DataReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -79,6 +90,12 @@ impl PurgeReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(PurgeReq { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -97,7 +114,7 @@ impl PurgeReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_PurgeReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -111,6 +128,12 @@ impl AssociateReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(AssociateReq { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -129,7 +152,7 @@ impl AssociateReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_AssociateReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -143,6 +166,12 @@ impl AssociateRsp {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(AssociateRsp { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -161,7 +190,7 @@ impl AssociateRsp {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_AssociateRsp_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -175,6 +204,12 @@ impl DisassociateReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(DisassociateReq { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -193,7 +228,7 @@ impl DisassociateReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_DisassociateReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -217,6 +252,12 @@ impl GetReq {
         Ok(GetReq { status, data })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
         buffer.extend(self.data.iter().rev());
@@ -234,7 +275,7 @@ impl GetReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_GetReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -248,6 +289,12 @@ impl SetReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(SetReq { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -266,7 +313,7 @@ impl SetReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_SetReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -298,6 +345,12 @@ impl SecurityGetReq {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
         buffer.put_u8(self.index1);
@@ -317,7 +370,7 @@ impl SecurityGetReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_SecurityGetReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -331,6 +384,12 @@ impl SecuritySetReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(SecuritySetReq { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -349,7 +408,7 @@ impl SecuritySetReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_SecuritySetReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -363,6 +422,12 @@ impl UpdatePANIdReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(UpdatePANIdReq { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -381,7 +446,7 @@ impl UpdatePANIdReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_UpdatePANIdReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -395,6 +460,12 @@ impl AddDeviceReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(AddDeviceReq { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -413,7 +484,7 @@ impl AddDeviceReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_AddDeviceReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -427,6 +498,12 @@ impl DeleteDeviceReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(DeleteDeviceReq { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -445,7 +522,7 @@ impl DeleteDeviceReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_DeleteDeviceReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -459,6 +536,12 @@ impl DeleteAllDevicesReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(DeleteAllDevicesReq { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -477,7 +560,7 @@ impl DeleteAllDevicesReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_DeleteAllDevicesReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -491,6 +574,12 @@ impl DeleteKeyReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(DeleteKeyReq { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -509,7 +598,7 @@ impl DeleteKeyReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_DeleteKeyReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -530,6 +619,12 @@ impl ReadKeyReq {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
         buffer.put_u32_le(self.frame_counter);
@@ -547,7 +642,7 @@ impl ReadKeyReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_ReadKeyReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -561,6 +656,12 @@ impl WriteKeyReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(WriteKeyReq { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -579,7 +680,7 @@ impl WriteKeyReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_WriteKeyReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -593,6 +694,12 @@ impl OrphanRsp {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(OrphanRsp { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -611,7 +718,7 @@ impl OrphanRsp {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_OrphanRsp_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -625,6 +732,12 @@ impl PollReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(PollReq { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -643,7 +756,7 @@ impl PollReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_PollReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -657,6 +770,12 @@ impl ResetReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(ResetReq { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -675,7 +794,7 @@ impl ResetReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_ResetReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -689,6 +808,12 @@ impl ScanReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(ScanReq { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -707,7 +832,7 @@ impl ScanReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_ScanReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -721,6 +846,12 @@ impl StartReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(StartReq { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -739,7 +870,7 @@ impl StartReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_StartReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -753,6 +884,12 @@ impl SyncReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(SyncReq { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -771,7 +908,7 @@ impl SyncReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_SyncReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -785,6 +922,12 @@ impl SetRxGainReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(SetRxGainReq { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -803,7 +946,7 @@ impl SetRxGainReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_SetRxGainReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -817,6 +960,12 @@ impl WSAsyncReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(WSAsyncReq { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -835,7 +984,7 @@ impl WSAsyncReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_WSAsyncReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -849,6 +998,12 @@ impl FHEnableReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(FHEnableReq { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -867,7 +1022,7 @@ impl FHEnableReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_FHEnableReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -881,6 +1036,12 @@ impl FHStartReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(FHStartReq { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -899,7 +1060,7 @@ impl FHStartReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_FHStartReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -922,6 +1083,12 @@ impl FHGetReq {
         Ok(FHGetReq { status, data })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
         buffer.extend(self.data.iter());
@@ -939,7 +1106,7 @@ impl FHGetReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_FHGetReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }
@@ -953,6 +1120,12 @@ impl FHSetReq {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let status = Status::try_decode(Read::by_ref(cursor))?;
         Ok(FHSetReq { status })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -971,7 +1144,7 @@ impl FHSetReq {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::MAC_FHSetReq_SRSP(self),
+            payload: self.encode(),
         }
     }
 }

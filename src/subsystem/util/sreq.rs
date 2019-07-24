@@ -1,6 +1,5 @@
 use crate::error::Error;
 use crate::frame::{CommandCode, MTFrame, MTHeader};
-use crate::subsystem::MTFramePayload;
 use crate::types::*;
 use bytes::{Buf, BufMut};
 use std::io::Cursor;
@@ -22,6 +21,12 @@ impl CallbackSubCmd {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.subsystem_id.encode_into(buffer);
         buffer.put_u32_le(self.enables);
@@ -39,7 +44,7 @@ impl CallbackSubCmd {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::UTIL_CallbackSubCmd_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -53,6 +58,12 @@ impl GetExtAddr {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let address_type = ExtendedAddressType::try_decode(Read::by_ref(cursor))?;
         Ok(GetExtAddr { address_type })
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
@@ -71,7 +82,7 @@ impl GetExtAddr {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::UTIL_GetExtAddr_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -100,6 +111,12 @@ impl Loopback {
         })
     }
 
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
+    }
+
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(self.repeats);
         buffer.put_u32_le(self.interval);
@@ -118,7 +135,7 @@ impl Loopback {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::UTIL_Loopback_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
@@ -129,6 +146,12 @@ pub struct Random {}
 impl Random {
     pub fn try_decode(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         Ok(Random {})
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        self.encode_into(&mut buffer);
+        buffer
     }
 
     pub fn encode_into(&self, _: &mut Vec<u8>) {}
@@ -145,7 +168,7 @@ impl Random {
                 },
             },
             extended_header: None,
-            payload: MTFramePayload::UTIL_Random_SREQ(self),
+            payload: self.encode(),
         }
     }
 }
