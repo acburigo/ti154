@@ -3,7 +3,7 @@ pub mod sreq;
 pub mod srsp;
 
 use crate::error::Error;
-use crate::frame::{MTExtendedHeader, MTHeader};
+use crate::frame::MTHeader;
 use crate::subsystem::MTFramePayload;
 use crate::types::CommandType;
 use num_traits::FromPrimitive;
@@ -11,7 +11,6 @@ use std::io::Cursor;
 
 pub fn try_decode(
     header: &MTHeader,
-    _: &Option<MTExtendedHeader>,
     cursor: &mut Cursor<&[u8]>,
 ) -> Result<MTFramePayload, Error> {
     use crate::types::UTILCommandId::*;

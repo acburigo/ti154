@@ -85,7 +85,7 @@ impl MTHeader {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct CommandCode {
     pub is_extended: bool,
     pub cmd_type: CommandType,

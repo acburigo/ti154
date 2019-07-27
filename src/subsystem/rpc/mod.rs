@@ -1,5 +1,5 @@
 use crate::error::Error;
-use crate::frame::{CommandCode, MTExtendedHeader, MTFrame, MTHeader};
+use crate::frame::{CommandCode, MTFrame, MTHeader};
 use crate::subsystem::MTFramePayload;
 use crate::types::{CommandType, ErrorCode, MTSubsystem, RPCCommandId};
 use num_traits::FromPrimitive;
@@ -7,7 +7,6 @@ use std::io::Cursor;
 
 pub fn try_decode(
     header: &MTHeader,
-    _: &Option<MTExtendedHeader>,
     cursor: &mut Cursor<&[u8]>,
 ) -> Result<MTFramePayload, Error> {
     use MTFramePayload::*;

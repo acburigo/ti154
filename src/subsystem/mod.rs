@@ -4,7 +4,7 @@ pub mod sys;
 pub mod util;
 
 use crate::error::Error;
-use crate::frame::{MTExtendedHeader, MTHeader};
+use crate::frame::MTHeader;
 use crate::types::MTSubsystem;
 use std::io::Cursor;
 
@@ -134,14 +134,13 @@ pub enum MTFramePayload {
 impl MTFramePayload {
     pub fn try_decode(
         header: &MTHeader,
-        extended_header: &Option<MTExtendedHeader>,
         cursor: &mut Cursor<&[u8]>,
     ) -> Result<Self, Error> {
         match header.command.subsystem {
-            MTSubsystem::MAC => mac::try_decode(header, extended_header, cursor),
-            MTSubsystem::RPC => rpc::try_decode(header, extended_header, cursor),
-            MTSubsystem::SYS => sys::try_decode(header, extended_header, cursor),
-            MTSubsystem::UTIL => util::try_decode(header, extended_header, cursor),
+            MTSubsystem::MAC => mac::try_decode(header, cursor),
+            MTSubsystem::RPC => rpc::try_decode(header, cursor),
+            MTSubsystem::SYS => sys::try_decode(header, cursor),
+            MTSubsystem::UTIL => util::try_decode(header, cursor),
         }
     }
 
