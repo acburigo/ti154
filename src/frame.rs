@@ -4,7 +4,7 @@ use bytes::{Buf, BufMut};
 use num_traits::FromPrimitive;
 use std::io::{Cursor, Read};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MTFrame {
     pub header: MTHeader,
     pub extended_header: Option<MTExtendedHeader>,
@@ -58,7 +58,7 @@ impl MTFrame {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MTHeader {
     pub length: u8,
     pub command: CommandCode,
@@ -85,7 +85,7 @@ impl MTHeader {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct CommandCode {
     pub is_extended: bool,
     pub cmd_type: CommandType,
@@ -130,7 +130,7 @@ impl CommandCode {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum MTExtendedHeader {
     V1 {
         stack_id: u8,

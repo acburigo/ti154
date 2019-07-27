@@ -132,10 +132,7 @@ pub enum MTFramePayload {
 }
 
 impl MTFramePayload {
-    pub fn try_decode(
-        header: &MTHeader,
-        cursor: &mut Cursor<&[u8]>,
-    ) -> Result<Self, Error> {
+    pub fn try_decode(header: &MTHeader, cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         match header.command.subsystem {
             MTSubsystem::MAC => mac::try_decode(header, cursor),
             MTSubsystem::RPC => rpc::try_decode(header, cursor),

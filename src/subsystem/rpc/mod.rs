@@ -5,10 +5,7 @@ use crate::types::{CommandType, ErrorCode, MTSubsystem, RPCCommandId};
 use num_traits::FromPrimitive;
 use std::io::Cursor;
 
-pub fn try_decode(
-    header: &MTHeader,
-    cursor: &mut Cursor<&[u8]>,
-) -> Result<MTFramePayload, Error> {
+pub fn try_decode(header: &MTHeader, cursor: &mut Cursor<&[u8]>) -> Result<MTFramePayload, Error> {
     use MTFramePayload::*;
 
     let command_id =

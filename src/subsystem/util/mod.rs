@@ -9,10 +9,7 @@ use crate::types::CommandType;
 use num_traits::FromPrimitive;
 use std::io::Cursor;
 
-pub fn try_decode(
-    header: &MTHeader,
-    cursor: &mut Cursor<&[u8]>,
-) -> Result<MTFramePayload, Error> {
+pub fn try_decode(header: &MTHeader, cursor: &mut Cursor<&[u8]>) -> Result<MTFramePayload, Error> {
     use crate::types::UTILCommandId::*;
     use MTFramePayload::*;
 
