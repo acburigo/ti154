@@ -3,7 +3,6 @@ use crate::frame::{CommandCode, MTFrame, MTHeader};
 use crate::types::*;
 use bytes::{Buf, BufMut};
 use std::io::Cursor;
-use std::io::Read;
 
 #[derive(Debug)]
 pub struct ResetReq {
@@ -11,8 +10,9 @@ pub struct ResetReq {
 }
 
 impl ResetReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let reset_type = ResetType::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let reset_type = ResetType::try_decode(&mut cursor)?;
         Ok(ResetReq { reset_type })
     }
 
@@ -54,10 +54,11 @@ pub struct ResetInd {
 }
 
 impl ResetInd {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let reason = ResetReason::try_decode(Read::by_ref(cursor))?;
-        let transport = TransportProtocolRevision::try_decode(Read::by_ref(cursor))?;
-        let product = ProductIdCode::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let reason = ResetReason::try_decode(&mut cursor)?;
+        let transport = TransportProtocolRevision::try_decode(&mut cursor)?;
+        let product = ProductIdCode::try_decode(&mut cursor)?;
         let major = cursor.get_u8();
         let minor = cursor.get_u8();
         let maint = cursor.get_u8();

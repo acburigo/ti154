@@ -12,8 +12,9 @@ pub struct CallbackSubCmd {
 }
 
 impl CallbackSubCmd {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         let enables = cursor.get_u32_le();
         Ok(CallbackSubCmd { status, enables })
     }
@@ -53,9 +54,10 @@ pub struct GetExtAddr {
 }
 
 impl GetExtAddr {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let address_type = ExtendedAddressType::try_decode(Read::by_ref(cursor))?;
-        let ext_address = ExtendedAddress::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let address_type = ExtendedAddressType::try_decode(&mut cursor)?;
+        let ext_address = ExtendedAddress::try_decode(&mut cursor)?;
         Ok(GetExtAddr {
             address_type,
             ext_address,
@@ -98,7 +100,8 @@ pub struct Loopback {
 }
 
 impl Loopback {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
         let repeats = cursor.get_u8();
         let interval = cursor.get_u32_le();
 
@@ -149,7 +152,8 @@ pub struct Random {
 }
 
 impl Random {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
         let number = cursor.get_u16_le();
         Ok(Random { number })
     }

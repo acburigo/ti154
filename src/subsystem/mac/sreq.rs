@@ -9,7 +9,7 @@ use std::io::Read;
 pub struct Init {}
 
 impl Init {
-    pub fn try_decode(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(_: &[u8]) -> Result<Self, Error> {
         Ok(Init {})
     }
 
@@ -59,17 +59,18 @@ pub struct DataReq {
 }
 
 impl DataReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let dest_address = Address::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let dest_address = Address::try_decode(&mut cursor)?;
         let dest_pan_id = cursor.get_u16_le();
-        let src_address_mode = AddressMode::try_decode(Read::by_ref(cursor))?;
+        let src_address_mode = AddressMode::try_decode(&mut cursor)?;
         let handle = cursor.get_u8();
-        let tx_option = TxOption::try_decode(Read::by_ref(cursor))?;
+        let tx_option = TxOption::try_decode(&mut cursor)?;
         let channel = cursor.get_u8();
         let power = cursor.get_u8();
-        let key_source = KeySource::try_decode(Read::by_ref(cursor))?;
-        let security_level = SecurityLevel::try_decode(Read::by_ref(cursor))?;
-        let key_id_mode = KeyIdMode::try_decode(Read::by_ref(cursor))?;
+        let key_source = KeySource::try_decode(&mut cursor)?;
+        let security_level = SecurityLevel::try_decode(&mut cursor)?;
+        let key_id_mode = KeyIdMode::try_decode(&mut cursor)?;
         let key_index = cursor.get_u8();
         let include_fh_ies = cursor.get_u32_le();
         let data_length = cursor.get_u16_le();
@@ -153,7 +154,8 @@ pub struct PurgeReq {
 }
 
 impl PurgeReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
         let handle = cursor.get_u8();
         Ok(PurgeReq { handle })
     }
@@ -200,16 +202,17 @@ pub struct AssociateReq {
 }
 
 impl AssociateReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
         let logical_channel = cursor.get_u8();
         let channel_page = cursor.get_u8();
         let phy_id = cursor.get_u8();
-        let coord_address = Address::try_decode(Read::by_ref(cursor))?;
+        let coord_address = Address::try_decode(&mut cursor)?;
         let coord_pan_id = cursor.get_u16_le();
         let capability_info = cursor.get_u8();
-        let key_source = KeySource::try_decode(Read::by_ref(cursor))?;
-        let security_level = SecurityLevel::try_decode(Read::by_ref(cursor))?;
-        let key_id_mode = KeyIdMode::try_decode(Read::by_ref(cursor))?;
+        let key_source = KeySource::try_decode(&mut cursor)?;
+        let security_level = SecurityLevel::try_decode(&mut cursor)?;
+        let key_id_mode = KeyIdMode::try_decode(&mut cursor)?;
         let key_index = cursor.get_u8();
         Ok(AssociateReq {
             logical_channel,
@@ -273,13 +276,14 @@ pub struct AssociateRsp {
 }
 
 impl AssociateRsp {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let extended_address = ExtendedAddress::try_decode(Read::by_ref(cursor))?;
-        let assoc_short_address = ShortAddress::try_decode(Read::by_ref(cursor))?;
-        let assoc_status = AssociationStatus::try_decode(Read::by_ref(cursor))?;
-        let key_source = KeySource::try_decode(Read::by_ref(cursor))?;
-        let security_level = SecurityLevel::try_decode(Read::by_ref(cursor))?;
-        let key_id_mode = KeyIdMode::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let extended_address = ExtendedAddress::try_decode(&mut cursor)?;
+        let assoc_short_address = ShortAddress::try_decode(&mut cursor)?;
+        let assoc_status = AssociationStatus::try_decode(&mut cursor)?;
+        let key_source = KeySource::try_decode(&mut cursor)?;
+        let security_level = SecurityLevel::try_decode(&mut cursor)?;
+        let key_id_mode = KeyIdMode::try_decode(&mut cursor)?;
         let key_index = cursor.get_u8();
         Ok(AssociateRsp {
             extended_address,
@@ -338,14 +342,15 @@ pub struct DisassociateReq {
 }
 
 impl DisassociateReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let device_address = Address::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let device_address = Address::try_decode(&mut cursor)?;
         let device_pan_id = cursor.get_u16_le();
-        let disassociate_reason = DisassociateReason::try_decode(Read::by_ref(cursor))?;
+        let disassociate_reason = DisassociateReason::try_decode(&mut cursor)?;
         let tx_indirect = cursor.get_u8();
-        let key_source = KeySource::try_decode(Read::by_ref(cursor))?;
-        let security_level = SecurityLevel::try_decode(Read::by_ref(cursor))?;
-        let key_id_mode = KeyIdMode::try_decode(Read::by_ref(cursor))?;
+        let key_source = KeySource::try_decode(&mut cursor)?;
+        let security_level = SecurityLevel::try_decode(&mut cursor)?;
+        let key_id_mode = KeyIdMode::try_decode(&mut cursor)?;
         let key_index = cursor.get_u8();
         Ok(DisassociateReq {
             device_address,
@@ -399,8 +404,9 @@ pub struct GetReq {
 }
 
 impl GetReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let attribute_id = MACPIBAttributeId::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let attribute_id = MACPIBAttributeId::try_decode(&mut cursor)?;
         Ok(GetReq { attribute_id })
     }
 
@@ -438,8 +444,9 @@ pub struct SetReq {
 }
 
 impl SetReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let attribute_id = MACPIBAttributeId::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let attribute_id = MACPIBAttributeId::try_decode(&mut cursor)?;
 
         let mut attribute_value: [u8; 16] = Default::default();
         cursor
@@ -489,8 +496,9 @@ pub struct SecurityGetReq {
 }
 
 impl SecurityGetReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let attribute_id = SecurityPIBAttributeId::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let attribute_id = SecurityPIBAttributeId::try_decode(&mut cursor)?;
         let index1 = cursor.get_u8();
         let index2 = cursor.get_u8();
 
@@ -539,8 +547,9 @@ pub struct SecuritySetReq {
 }
 
 impl SecuritySetReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let attribute_id = SecurityPIBAttributeId::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let attribute_id = SecurityPIBAttributeId::try_decode(&mut cursor)?;
         let index1 = cursor.get_u8();
         let index2 = cursor.get_u8();
 
@@ -593,7 +602,8 @@ pub struct UpdatePANIdReq {
 }
 
 impl UpdatePANIdReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
         let pan_id = cursor.get_u16_le();
         Ok(UpdatePANIdReq { pan_id })
     }
@@ -639,10 +649,11 @@ pub struct AddDeviceReq {
 }
 
 impl AddDeviceReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
         let pan_id = cursor.get_u16_le();
-        let short_addr = ShortAddress::try_decode(Read::by_ref(cursor))?;
-        let ext_addr = ExtendedAddress::try_decode(Read::by_ref(cursor))?;
+        let short_addr = ShortAddress::try_decode(&mut cursor)?;
+        let ext_addr = ExtendedAddress::try_decode(&mut cursor)?;
         let frame_counter = cursor.get_u32_le();
         let exempt = cursor.get_u8() != 0;
         let unique = cursor.get_u8() != 0;
@@ -709,8 +720,9 @@ pub struct DeleteDeviceReq {
 }
 
 impl DeleteDeviceReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let ext_addr = ExtendedAddress::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let ext_addr = ExtendedAddress::try_decode(&mut cursor)?;
         Ok(DeleteDeviceReq { ext_addr })
     }
 
@@ -745,7 +757,7 @@ impl DeleteDeviceReq {
 pub struct DeleteAllDevicesReq {}
 
 impl DeleteAllDevicesReq {
-    pub fn try_decode(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(_: &[u8]) -> Result<Self, Error> {
         Ok(DeleteAllDevicesReq {})
     }
 
@@ -780,7 +792,8 @@ pub struct DeleteKeyReq {
 }
 
 impl DeleteKeyReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
         let index = cursor.get_u8();
         Ok(DeleteKeyReq { index })
     }
@@ -818,7 +831,8 @@ pub struct ReadKeyReq {
 }
 
 impl ReadKeyReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
         let index = cursor.get_u8();
         Ok(ReadKeyReq { index })
     }
@@ -861,7 +875,8 @@ pub struct WriteKeyReq {
 }
 
 impl WriteKeyReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
         let new = cursor.get_u8() != 0;
         let index = cursor.get_u16_le();
 
@@ -934,13 +949,14 @@ pub struct OrphanRsp {
 }
 
 impl OrphanRsp {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let extended_address = ExtendedAddress::try_decode(Read::by_ref(cursor))?;
-        let assoc_short_address = ShortAddress::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let extended_address = ExtendedAddress::try_decode(&mut cursor)?;
+        let assoc_short_address = ShortAddress::try_decode(&mut cursor)?;
         let associated_member = cursor.get_u8() != 0;
-        let key_source = KeySource::try_decode(Read::by_ref(cursor))?;
-        let security_level = SecurityLevel::try_decode(Read::by_ref(cursor))?;
-        let key_id_mode = KeyIdMode::try_decode(Read::by_ref(cursor))?;
+        let key_source = KeySource::try_decode(&mut cursor)?;
+        let security_level = SecurityLevel::try_decode(&mut cursor)?;
+        let key_id_mode = KeyIdMode::try_decode(&mut cursor)?;
         let key_index = cursor.get_u8();
         Ok(OrphanRsp {
             extended_address,
@@ -997,12 +1013,13 @@ pub struct PollReq {
 }
 
 impl PollReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let coord_address = Address::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let coord_address = Address::try_decode(&mut cursor)?;
         let coord_pan_id = cursor.get_u16_le();
-        let key_source = KeySource::try_decode(Read::by_ref(cursor))?;
-        let security_level = SecurityLevel::try_decode(Read::by_ref(cursor))?;
-        let key_id_mode = KeyIdMode::try_decode(Read::by_ref(cursor))?;
+        let key_source = KeySource::try_decode(&mut cursor)?;
+        let security_level = SecurityLevel::try_decode(&mut cursor)?;
+        let key_id_mode = KeyIdMode::try_decode(&mut cursor)?;
         let key_index = cursor.get_u8();
         Ok(PollReq {
             coord_address,
@@ -1052,7 +1069,8 @@ pub struct ResetReq {
 }
 
 impl ResetReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
         let set_default = cursor.get_u8() != 0;
         Ok(ResetReq { set_default })
     }
@@ -1105,23 +1123,24 @@ pub struct ScanReq {
 }
 
 impl ScanReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let scan_type = ScanType::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let scan_type = ScanType::try_decode(&mut cursor)?;
         let scan_duration = cursor.get_u8();
         let channel_page = cursor.get_u8();
-        let phy_id = PhyId::try_decode(Read::by_ref(cursor))?;
+        let phy_id = PhyId::try_decode(&mut cursor)?;
         let max_results = cursor.get_u8();
-        let permit_join = PermitJoin::try_decode(Read::by_ref(cursor))?;
+        let permit_join = PermitJoin::try_decode(&mut cursor)?;
         let link_quality = cursor.get_u8();
         let rsp_filter = cursor.get_u8();
-        let mpm_scan = MPMScan::try_decode(Read::by_ref(cursor))?;
-        let mpm_type = MPMType::try_decode(Read::by_ref(cursor))?;
+        let mpm_scan = MPMScan::try_decode(&mut cursor)?;
+        let mpm_type = MPMType::try_decode(&mut cursor)?;
         let mpm_duration = cursor.get_u16_le();
-        let key_source = KeySource::try_decode(Read::by_ref(cursor))?;
-        let security_level = SecurityLevel::try_decode(Read::by_ref(cursor))?;
-        let key_id_mode = KeyIdMode::try_decode(Read::by_ref(cursor))?;
+        let key_source = KeySource::try_decode(&mut cursor)?;
+        let security_level = SecurityLevel::try_decode(&mut cursor)?;
+        let key_id_mode = KeyIdMode::try_decode(&mut cursor)?;
         let key_index = cursor.get_u8();
-        let channels = ChannelsBitMap::try_decode(Read::by_ref(cursor))?;
+        let channels = ChannelsBitMap::try_decode(&mut cursor)?;
         Ok(ScanReq {
             scan_type,
             scan_duration,
@@ -1213,24 +1232,25 @@ pub struct StartReq {
 }
 
 impl StartReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
         let start_time = cursor.get_u32_le();
         let pan_id = cursor.get_u16_le();
         let logical_channel = cursor.get_u8();
         let channel_page = cursor.get_u8();
-        let phy_id = PhyId::try_decode(Read::by_ref(cursor))?;
+        let phy_id = PhyId::try_decode(&mut cursor)?;
         let beacon_order = cursor.get_u8();
         let super_frame_order = cursor.get_u8();
         let pan_coordinator = cursor.get_u8() != 0;
         let battery_life_ext = cursor.get_u8() != 0;
         let coord_realignment = cursor.get_u8() != 0;
-        let realign_key_source = KeySource::try_decode(Read::by_ref(cursor))?;
-        let realign_security_level = SecurityLevel::try_decode(Read::by_ref(cursor))?;
-        let realign_key_id_mode = KeyIdMode::try_decode(Read::by_ref(cursor))?;
+        let realign_key_source = KeySource::try_decode(&mut cursor)?;
+        let realign_security_level = SecurityLevel::try_decode(&mut cursor)?;
+        let realign_key_id_mode = KeyIdMode::try_decode(&mut cursor)?;
         let realign_key_index = cursor.get_u8();
-        let beacon_key_source = KeySource::try_decode(Read::by_ref(cursor))?;
-        let beacon_security_level = SecurityLevel::try_decode(Read::by_ref(cursor))?;
-        let beacon_key_id_mode = KeyIdMode::try_decode(Read::by_ref(cursor))?;
+        let beacon_key_source = KeySource::try_decode(&mut cursor)?;
+        let beacon_security_level = SecurityLevel::try_decode(&mut cursor)?;
+        let beacon_key_id_mode = KeyIdMode::try_decode(&mut cursor)?;
         let beacon_key_index = cursor.get_u8();
         let start_fh = cursor.get_u8() != 0;
         let enh_beacon_order = cursor.get_u8();
@@ -1330,11 +1350,12 @@ pub struct SyncReq {
 }
 
 impl SyncReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
         let logical_channel = cursor.get_u8();
         let channel_page = cursor.get_u8();
         let track_beacon = cursor.get_u8() != 0;
-        let phy_id = PhyId::try_decode(Read::by_ref(cursor))?;
+        let phy_id = PhyId::try_decode(&mut cursor)?;
         Ok(SyncReq {
             logical_channel,
             channel_page,
@@ -1379,7 +1400,8 @@ pub struct SetRxGainReq {
 }
 
 impl SetRxGainReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
         let mode = cursor.get_u8() != 0;
         Ok(SetRxGainReq { mode })
     }
@@ -1423,14 +1445,15 @@ pub struct WSAsyncReq {
 }
 
 impl WSAsyncReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let operation = WiSUNAsyncOperation::try_decode(Read::by_ref(cursor))?;
-        let frame_type = WiSUNAsyncFrameType::try_decode(Read::by_ref(cursor))?;
-        let key_source = KeySource::try_decode(Read::by_ref(cursor))?;
-        let security_level = SecurityLevel::try_decode(Read::by_ref(cursor))?;
-        let key_id_mode = KeyIdMode::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let operation = WiSUNAsyncOperation::try_decode(&mut cursor)?;
+        let frame_type = WiSUNAsyncFrameType::try_decode(&mut cursor)?;
+        let key_source = KeySource::try_decode(&mut cursor)?;
+        let security_level = SecurityLevel::try_decode(&mut cursor)?;
+        let key_id_mode = KeyIdMode::try_decode(&mut cursor)?;
         let key_index = cursor.get_u8();
-        let channels = ChannelsBitMap::try_decode(Read::by_ref(cursor))?;
+        let channels = ChannelsBitMap::try_decode(&mut cursor)?;
         Ok(WSAsyncReq {
             operation,
             frame_type,
@@ -1479,7 +1502,7 @@ impl WSAsyncReq {
 pub struct FHEnableReq {}
 
 impl FHEnableReq {
-    pub fn try_decode(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(_: &[u8]) -> Result<Self, Error> {
         Ok(FHEnableReq {})
     }
 
@@ -1512,7 +1535,7 @@ impl FHEnableReq {
 pub struct FHStartReq {}
 
 impl FHStartReq {
-    pub fn try_decode(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(_: &[u8]) -> Result<Self, Error> {
         Ok(FHStartReq {})
     }
 
@@ -1547,8 +1570,9 @@ pub struct FHGetReq {
 }
 
 impl FHGetReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let attribute_id = FHPIBAttributeId::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let attribute_id = FHPIBAttributeId::try_decode(&mut cursor)?;
         Ok(FHGetReq { attribute_id })
     }
 
@@ -1586,8 +1610,9 @@ pub struct FHSetReq {
 }
 
 impl FHSetReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let attribute_id = FHPIBAttributeId::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let attribute_id = FHPIBAttributeId::try_decode(&mut cursor)?;
 
         let mut data = Vec::new();
         cursor

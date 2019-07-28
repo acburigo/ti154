@@ -9,7 +9,7 @@ use std::io::Read;
 pub struct PingReq {}
 
 impl PingReq {
-    pub fn try_decode(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(_: &[u8]) -> Result<Self, Error> {
         Ok(PingReq {})
     }
 
@@ -42,7 +42,7 @@ impl PingReq {
 pub struct VersionReq {}
 
 impl VersionReq {
-    pub fn try_decode(_: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(_: &[u8]) -> Result<Self, Error> {
         Ok(VersionReq {})
     }
 
@@ -80,7 +80,8 @@ pub struct NVCreateReq {
 }
 
 impl NVCreateReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
         let sys_id = cursor.get_u8();
         let item_id = cursor.get_u16_le();
         let sub_id = cursor.get_u16_le();
@@ -131,7 +132,8 @@ pub struct NVDeleteReq {
 }
 
 impl NVDeleteReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
         let sys_id = cursor.get_u8();
         let item_id = cursor.get_u16_le();
         let sub_id = cursor.get_u16_le();
@@ -179,7 +181,8 @@ pub struct NVLengthReq {
 }
 
 impl NVLengthReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
         let sys_id = cursor.get_u8();
         let item_id = cursor.get_u16_le();
         let sub_id = cursor.get_u16_le();
@@ -229,7 +232,8 @@ pub struct NVReadReq {
 }
 
 impl NVReadReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
         let sys_id = cursor.get_u8();
         let item_id = cursor.get_u16_le();
         let sub_id = cursor.get_u16_le();
@@ -286,7 +290,8 @@ pub struct NVWriteReq {
 }
 
 impl NVWriteReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
         let sys_id = cursor.get_u8();
         let item_id = cursor.get_u16_le();
         let sub_id = cursor.get_u16_le();
@@ -350,7 +355,8 @@ pub struct NVUpdateReq {
 }
 
 impl NVUpdateReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
         let sys_id = cursor.get_u8();
         let item_id = cursor.get_u16_le();
         let sub_id = cursor.get_u16_le();
@@ -407,7 +413,8 @@ pub struct NVCompactReq {
 }
 
 impl NVCompactReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
         let threshold = cursor.get_u16_le();
         Ok(NVCompactReq { threshold })
     }

@@ -45,8 +45,7 @@ mod tests {
         assert_eq!(frame.header.command.id, types::SYSCommandId::ResetInd as u8);
         assert!(frame.extended_header.is_none());
 
-        let mut cursor = Cursor::new(frame.payload.as_slice());
-        if let Ok(payload) = subsystem::sys::areq::ResetInd::try_decode(&mut cursor) {
+        if let Ok(payload) = subsystem::sys::areq::ResetInd::try_decode(frame.payload.as_slice()) {
             assert_eq!(payload.reason, types::ResetReason::Hardware);
             assert_eq!(
                 payload.transport,
@@ -73,8 +72,7 @@ mod tests {
         assert_eq!(frame.header.command.id, types::MACCommandId::ResetReq as u8);
         assert!(frame.extended_header.is_none());
 
-        let mut cursor = Cursor::new(frame.payload.as_slice());
-        if let Ok(payload) = subsystem::mac::srsp::ResetReq::try_decode(&mut cursor) {
+        if let Ok(payload) = subsystem::mac::srsp::ResetReq::try_decode(frame.payload.as_slice()) {
             assert_eq!(payload.status, types::Status::Success);
         } else {
             panic!("Invalid payload.");
@@ -130,8 +128,7 @@ mod tests {
 
         assert_eq!(data.len(), 351);
 
-        let mut cursor = Cursor::new(&data[..]);
-        if let Ok(payload) = subsystem::mac::areq::DataInd::try_decode(&mut cursor) {
+        if let Ok(payload) = subsystem::mac::areq::DataInd::try_decode(&data[..]) {
             assert_eq!(payload.timestamp, 1512743);
             assert_eq!(payload.timestamp2, 4);
             assert_eq!(payload.src_pan_id, 0xfffa);

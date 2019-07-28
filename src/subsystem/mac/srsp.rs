@@ -11,8 +11,9 @@ pub struct Init {
 }
 
 impl Init {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         Ok(Init { status })
     }
 
@@ -49,8 +50,9 @@ pub struct DataReq {
 }
 
 impl DataReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         Ok(DataReq { status })
     }
 
@@ -87,8 +89,9 @@ pub struct PurgeReq {
 }
 
 impl PurgeReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         Ok(PurgeReq { status })
     }
 
@@ -125,8 +128,9 @@ pub struct AssociateReq {
 }
 
 impl AssociateReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         Ok(AssociateReq { status })
     }
 
@@ -163,8 +167,9 @@ pub struct AssociateRsp {
 }
 
 impl AssociateRsp {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         Ok(AssociateRsp { status })
     }
 
@@ -201,8 +206,9 @@ pub struct DisassociateReq {
 }
 
 impl DisassociateReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         Ok(DisassociateReq { status })
     }
 
@@ -240,8 +246,9 @@ pub struct GetReq {
 }
 
 impl GetReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
 
         let mut data: [u8; 16] = Default::default();
         cursor
@@ -286,8 +293,9 @@ pub struct SetReq {
 }
 
 impl SetReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         Ok(SetReq { status })
     }
 
@@ -327,8 +335,9 @@ pub struct SecurityGetReq {
 }
 
 impl SecurityGetReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         let index1 = cursor.get_u8();
         let index2 = cursor.get_u8();
 
@@ -381,8 +390,9 @@ pub struct SecuritySetReq {
 }
 
 impl SecuritySetReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         Ok(SecuritySetReq { status })
     }
 
@@ -419,8 +429,9 @@ pub struct UpdatePANIdReq {
 }
 
 impl UpdatePANIdReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         Ok(UpdatePANIdReq { status })
     }
 
@@ -457,8 +468,9 @@ pub struct AddDeviceReq {
 }
 
 impl AddDeviceReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         Ok(AddDeviceReq { status })
     }
 
@@ -495,8 +507,9 @@ pub struct DeleteDeviceReq {
 }
 
 impl DeleteDeviceReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         Ok(DeleteDeviceReq { status })
     }
 
@@ -533,8 +546,9 @@ pub struct DeleteAllDevicesReq {
 }
 
 impl DeleteAllDevicesReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         Ok(DeleteAllDevicesReq { status })
     }
 
@@ -571,8 +585,9 @@ pub struct DeleteKeyReq {
 }
 
 impl DeleteKeyReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         Ok(DeleteKeyReq { status })
     }
 
@@ -610,8 +625,9 @@ pub struct ReadKeyReq {
 }
 
 impl ReadKeyReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         let frame_counter = cursor.get_u32_le();
         Ok(ReadKeyReq {
             status,
@@ -653,8 +669,9 @@ pub struct WriteKeyReq {
 }
 
 impl WriteKeyReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         Ok(WriteKeyReq { status })
     }
 
@@ -691,8 +708,9 @@ pub struct OrphanRsp {
 }
 
 impl OrphanRsp {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         Ok(OrphanRsp { status })
     }
 
@@ -729,8 +747,9 @@ pub struct PollReq {
 }
 
 impl PollReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         Ok(PollReq { status })
     }
 
@@ -767,8 +786,9 @@ pub struct ResetReq {
 }
 
 impl ResetReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         Ok(ResetReq { status })
     }
 
@@ -805,8 +825,9 @@ pub struct ScanReq {
 }
 
 impl ScanReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         Ok(ScanReq { status })
     }
 
@@ -843,8 +864,9 @@ pub struct StartReq {
 }
 
 impl StartReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         Ok(StartReq { status })
     }
 
@@ -881,8 +903,9 @@ pub struct SyncReq {
 }
 
 impl SyncReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         Ok(SyncReq { status })
     }
 
@@ -919,8 +942,9 @@ pub struct SetRxGainReq {
 }
 
 impl SetRxGainReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         Ok(SetRxGainReq { status })
     }
 
@@ -957,8 +981,9 @@ pub struct WSAsyncReq {
 }
 
 impl WSAsyncReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         Ok(WSAsyncReq { status })
     }
 
@@ -995,8 +1020,9 @@ pub struct FHEnableReq {
 }
 
 impl FHEnableReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         Ok(FHEnableReq { status })
     }
 
@@ -1033,8 +1059,9 @@ pub struct FHStartReq {
 }
 
 impl FHStartReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         Ok(FHStartReq { status })
     }
 
@@ -1072,8 +1099,9 @@ pub struct FHGetReq {
 }
 
 impl FHGetReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
 
         let mut data = Vec::new();
         cursor
@@ -1117,8 +1145,9 @@ pub struct FHSetReq {
 }
 
 impl FHSetReq {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         Ok(FHSetReq { status })
     }
 

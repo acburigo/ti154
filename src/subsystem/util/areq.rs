@@ -13,7 +13,8 @@ pub struct Loopback {
 }
 
 impl Loopback {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
         let repeats = cursor.get_u8();
         let interval = cursor.get_u32_le();
 

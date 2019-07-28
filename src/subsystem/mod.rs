@@ -4,9 +4,7 @@ pub mod sys;
 pub mod util;
 
 use crate::error::Error;
-use crate::frame::MTHeader;
-use crate::types::MTSubsystem;
-use std::io::Cursor;
+use crate::types::{CommandType, MTSubsystem};
 
 #[derive(Debug)]
 #[allow(non_camel_case_types)]
@@ -132,12 +130,17 @@ pub enum MTFramePayload {
 }
 
 impl MTFramePayload {
-    pub fn try_decode(header: &MTHeader, cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        match header.command.subsystem {
-            MTSubsystem::MAC => mac::try_decode(header, cursor),
-            MTSubsystem::RPC => rpc::try_decode(header, cursor),
-            MTSubsystem::SYS => sys::try_decode(header, cursor),
-            MTSubsystem::UTIL => util::try_decode(header, cursor),
+    pub fn try_decode(
+        subsystem: &MTSubsystem,
+        cmd_type: &CommandType,
+        id: u8,
+        buffer: &[u8],
+    ) -> Result<Self, Error> {
+        match subsystem {
+            MTSubsystem::MAC => mac::try_decode(cmd_type, id, buffer),
+            MTSubsystem::RPC => rpc::try_decode(cmd_type, id, buffer),
+            MTSubsystem::SYS => sys::try_decode(cmd_type, id, buffer),
+            MTSubsystem::UTIL => util::try_decode(cmd_type, id, buffer),
         }
     }
 

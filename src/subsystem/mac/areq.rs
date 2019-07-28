@@ -19,8 +19,9 @@ pub struct DataCnf {
 }
 
 impl DataCnf {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         let handle = cursor.get_u8();
         let timestamp = cursor.get_u32_le();
         let timestamp2 = cursor.get_u16_le();
@@ -102,9 +103,10 @@ pub struct DataInd {
 }
 
 impl DataInd {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let src_address = Address::try_decode(Read::by_ref(cursor))?;
-        let dest_address = Address::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let src_address = Address::try_decode(&mut cursor)?;
+        let dest_address = Address::try_decode(&mut cursor)?;
         let timestamp = cursor.get_u32_le();
         let timestamp2 = cursor.get_u16_le();
         let src_pan_id = cursor.get_u16_le();
@@ -113,9 +115,9 @@ impl DataInd {
         let correlation = cursor.get_u8();
         let rssi = cursor.get_i8();
         let dsn = cursor.get_u8();
-        let key_source = KeySource::try_decode(Read::by_ref(cursor))?;
-        let security_level = SecurityLevel::try_decode(Read::by_ref(cursor))?;
-        let key_id_mode = KeyIdMode::try_decode(Read::by_ref(cursor))?;
+        let key_source = KeySource::try_decode(&mut cursor)?;
+        let security_level = SecurityLevel::try_decode(&mut cursor)?;
+        let key_id_mode = KeyIdMode::try_decode(&mut cursor)?;
         let key_index = cursor.get_u8();
         let frame_counter = cursor.get_u32_le();
         let data_length = cursor.get_u16_le();
@@ -206,8 +208,9 @@ pub struct PurgeCnf {
 }
 
 impl PurgeCnf {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         let handle = cursor.get_u8();
         Ok(PurgeCnf { status, handle })
     }
@@ -265,9 +268,10 @@ pub struct WSAsyncInd {
 }
 
 impl WSAsyncInd {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let src_address = Address::try_decode(Read::by_ref(cursor))?;
-        let dest_address = Address::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let src_address = Address::try_decode(&mut cursor)?;
+        let dest_address = Address::try_decode(&mut cursor)?;
         let timestamp = cursor.get_u32_le();
         let timestamp2 = cursor.get_u16_le();
         let src_pan_id = cursor.get_u16_le();
@@ -276,12 +280,12 @@ impl WSAsyncInd {
         let correlation = cursor.get_u8();
         let rssi = cursor.get_u8();
         let dsn = cursor.get_u8();
-        let key_source = KeySource::try_decode(Read::by_ref(cursor))?;
-        let security_level = SecurityLevel::try_decode(Read::by_ref(cursor))?;
-        let key_id_mode = KeyIdMode::try_decode(Read::by_ref(cursor))?;
+        let key_source = KeySource::try_decode(&mut cursor)?;
+        let security_level = SecurityLevel::try_decode(&mut cursor)?;
+        let key_id_mode = KeyIdMode::try_decode(&mut cursor)?;
         let key_index = cursor.get_u8();
         let frame_counter = cursor.get_u32_le();
-        let frame_type = WiSUNAsyncFrameType::try_decode(Read::by_ref(cursor))?;
+        let frame_type = WiSUNAsyncFrameType::try_decode(&mut cursor)?;
         let data_length = cursor.get_u16_le();
         let ie_length = cursor.get_u16_le();
 
@@ -379,15 +383,16 @@ pub struct SyncLossInd {
 }
 
 impl SyncLossInd {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         let pan_id = cursor.get_u16_le();
         let logical_channel = cursor.get_u8();
         let channel_page = cursor.get_u8();
-        let phy_id = PhyId::try_decode(Read::by_ref(cursor))?;
-        let key_source = KeySource::try_decode(Read::by_ref(cursor))?;
-        let security_level = SecurityLevel::try_decode(Read::by_ref(cursor))?;
-        let key_id_mode = KeyIdMode::try_decode(Read::by_ref(cursor))?;
+        let phy_id = PhyId::try_decode(&mut cursor)?;
+        let key_source = KeySource::try_decode(&mut cursor)?;
+        let security_level = SecurityLevel::try_decode(&mut cursor)?;
+        let key_id_mode = KeyIdMode::try_decode(&mut cursor)?;
         let key_index = cursor.get_u8();
 
         Ok(SyncLossInd {
@@ -449,12 +454,13 @@ pub struct AssociateInd {
 }
 
 impl AssociateInd {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let extended_address = ExtendedAddress::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let extended_address = ExtendedAddress::try_decode(&mut cursor)?;
         let capabilities = cursor.get_u8();
-        let key_source = KeySource::try_decode(Read::by_ref(cursor))?;
-        let security_level = SecurityLevel::try_decode(Read::by_ref(cursor))?;
-        let key_id_mode = KeyIdMode::try_decode(Read::by_ref(cursor))?;
+        let key_source = KeySource::try_decode(&mut cursor)?;
+        let security_level = SecurityLevel::try_decode(&mut cursor)?;
+        let key_id_mode = KeyIdMode::try_decode(&mut cursor)?;
         let key_index = cursor.get_u8();
 
         Ok(AssociateInd {
@@ -510,12 +516,13 @@ pub struct AssociateCnf {
 }
 
 impl AssociateCnf {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
-        let short_address = ShortAddress::try_decode(Read::by_ref(cursor))?;
-        let key_source = KeySource::try_decode(Read::by_ref(cursor))?;
-        let security_level = SecurityLevel::try_decode(Read::by_ref(cursor))?;
-        let key_id_mode = KeyIdMode::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
+        let short_address = ShortAddress::try_decode(&mut cursor)?;
+        let key_source = KeySource::try_decode(&mut cursor)?;
+        let security_level = SecurityLevel::try_decode(&mut cursor)?;
+        let key_id_mode = KeyIdMode::try_decode(&mut cursor)?;
         let key_index = cursor.get_u8();
 
         Ok(AssociateCnf {
@@ -567,14 +574,15 @@ pub enum BeaconNotifyInd {
 }
 
 impl BeaconNotifyInd {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
         use BeaconNotifyInd::{EnhancedFrame, StandardFrame};
 
         let beacon_type = cursor.get_u8();
 
         let beacon_frame = match beacon_type {
-            0 => StandardFrame(StandardBeaconFrame::try_decode(Read::by_ref(cursor))?),
-            1 => EnhancedFrame(EnhancedBeaconFrame::try_decode(Read::by_ref(cursor))?),
+            0 => StandardFrame(StandardBeaconFrame::try_decode(&mut cursor)?),
+            1 => EnhancedFrame(EnhancedBeaconFrame::try_decode(&mut cursor)?),
             _ => return Err(Error::InvalidBeaconType(beacon_type)),
         };
 
@@ -654,8 +662,8 @@ impl StandardBeaconFrame {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let bsn = cursor.get_u8();
         let timestamp = cursor.get_u32_le();
-        let coord_address_mode = AddressMode::try_decode(Read::by_ref(cursor))?;
-        let coord_extended_address = ExtendedAddress::try_decode(Read::by_ref(cursor))?;
+        let coord_address_mode = AddressMode::try_decode(cursor)?;
+        let coord_extended_address = ExtendedAddress::try_decode(cursor)?;
         let pan_id = cursor.get_u16_le();
         let superframe_spec = cursor.get_u16_le();
         let logical_channel = cursor.get_u8();
@@ -663,9 +671,9 @@ impl StandardBeaconFrame {
         let gts_permit = cursor.get_u8() != 0;
         let link_quality = cursor.get_u8();
         let security_failure = cursor.get_u8() != 0;
-        let key_source = KeySource::try_decode(Read::by_ref(cursor))?;
-        let security_level = SecurityLevel::try_decode(Read::by_ref(cursor))?;
-        let key_id_mode = KeyIdMode::try_decode(Read::by_ref(cursor))?;
+        let key_source = KeySource::try_decode(cursor)?;
+        let security_level = SecurityLevel::try_decode(cursor)?;
+        let key_id_mode = KeyIdMode::try_decode(cursor)?;
         let key_index = cursor.get_u8();
         let short_addrs = cursor.get_u8();
         let ext_addrs = cursor.get_u8();
@@ -673,12 +681,12 @@ impl StandardBeaconFrame {
 
         let mut short_addr_list = Vec::new();
         for _ in 0..short_addrs {
-            short_addr_list.push(ShortAddress::try_decode(Read::by_ref(cursor))?);
+            short_addr_list.push(ShortAddress::try_decode(cursor)?);
         }
 
         let mut ext_addr_list = Vec::new();
         for _ in 0..ext_addrs {
-            ext_addr_list.push(ExtendedAddress::try_decode(Read::by_ref(cursor))?);
+            ext_addr_list.push(ExtendedAddress::try_decode(cursor)?);
         }
 
         let mut nsdu = vec![0x00; sdu_length as usize];
@@ -812,12 +820,13 @@ pub struct DisassociateInd {
 }
 
 impl DisassociateInd {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let extended_address = ExtendedAddress::try_decode(Read::by_ref(cursor))?;
-        let disassociate_reason = DisassociateReason::try_decode(Read::by_ref(cursor))?;
-        let key_source = KeySource::try_decode(Read::by_ref(cursor))?;
-        let security_level = SecurityLevel::try_decode(Read::by_ref(cursor))?;
-        let key_id_mode = KeyIdMode::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let extended_address = ExtendedAddress::try_decode(&mut cursor)?;
+        let disassociate_reason = DisassociateReason::try_decode(&mut cursor)?;
+        let key_source = KeySource::try_decode(&mut cursor)?;
+        let security_level = SecurityLevel::try_decode(&mut cursor)?;
+        let key_id_mode = KeyIdMode::try_decode(&mut cursor)?;
         let key_index = cursor.get_u8();
 
         Ok(DisassociateInd {
@@ -870,9 +879,10 @@ pub struct DisassociateCnf {
 }
 
 impl DisassociateCnf {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
-        let device_addr = Address::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
+        let device_addr = Address::try_decode(&mut cursor)?;
         let device_pan_id = cursor.get_u16_le();
 
         Ok(DisassociateCnf {
@@ -921,11 +931,12 @@ pub struct OrphanInd {
 }
 
 impl OrphanInd {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let extended_address = ExtendedAddress::try_decode(Read::by_ref(cursor))?;
-        let key_source = KeySource::try_decode(Read::by_ref(cursor))?;
-        let security_level = SecurityLevel::try_decode(Read::by_ref(cursor))?;
-        let key_id_mode = KeyIdMode::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let extended_address = ExtendedAddress::try_decode(&mut cursor)?;
+        let key_source = KeySource::try_decode(&mut cursor)?;
+        let security_level = SecurityLevel::try_decode(&mut cursor)?;
+        let key_id_mode = KeyIdMode::try_decode(&mut cursor)?;
         let key_index = cursor.get_u8();
         Ok(OrphanInd {
             extended_address,
@@ -974,8 +985,9 @@ pub struct PollCnf {
 }
 
 impl PollCnf {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         let frame_pending = cursor.get_u8() != 0;
         Ok(PollCnf {
             status,
@@ -1019,8 +1031,9 @@ pub struct PollInd {
 }
 
 impl PollInd {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let dev_addr = Address::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let dev_addr = Address::try_decode(&mut cursor)?;
         let pan_id = cursor.get_u16_le();
         let no_response = cursor.get_u8() != 0;
         Ok(PollInd {
@@ -1071,12 +1084,13 @@ pub struct ScanCnf {
 }
 
 impl ScanCnf {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
-        let scan_type = ScanType::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
+        let scan_type = ScanType::try_decode(&mut cursor)?;
         let channel_page = cursor.get_u8();
-        let phy_id = PhyId::try_decode(Read::by_ref(cursor))?;
-        let unscanned_channels = ChannelsBitMap::try_decode(Read::by_ref(cursor))?;
+        let phy_id = PhyId::try_decode(&mut cursor)?;
+        let unscanned_channels = ChannelsBitMap::try_decode(&mut cursor)?;
         let result_list_count = cursor.get_u8();
 
         let mut result_list = Vec::new();
@@ -1142,15 +1156,16 @@ pub struct CommStatusInd {
 }
 
 impl CommStatusInd {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
-        let src_addr = Address::try_decode(Read::by_ref(cursor))?;
-        let dst_addr = Address::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
+        let src_addr = Address::try_decode(&mut cursor)?;
+        let dst_addr = Address::try_decode(&mut cursor)?;
         let device_pan_id = cursor.get_u16_le();
-        let reason = CommEventReason::try_decode(Read::by_ref(cursor))?;
-        let key_source = KeySource::try_decode(Read::by_ref(cursor))?;
-        let security_level = SecurityLevel::try_decode(Read::by_ref(cursor))?;
-        let key_id_mode = KeyIdMode::try_decode(Read::by_ref(cursor))?;
+        let reason = CommEventReason::try_decode(&mut cursor)?;
+        let key_source = KeySource::try_decode(&mut cursor)?;
+        let security_level = SecurityLevel::try_decode(&mut cursor)?;
+        let key_id_mode = KeyIdMode::try_decode(&mut cursor)?;
         let key_index = cursor.get_u8();
 
         Ok(CommStatusInd {
@@ -1207,8 +1222,9 @@ pub struct StartCnf {
 }
 
 impl StartCnf {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         Ok(StartCnf { status })
     }
 
@@ -1245,8 +1261,9 @@ pub struct WSAsyncCnf {
 }
 
 impl WSAsyncCnf {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let status = Status::try_decode(Read::by_ref(cursor))?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let status = Status::try_decode(&mut cursor)?;
         Ok(WSAsyncCnf { status })
     }
 

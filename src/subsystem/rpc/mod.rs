@@ -5,19 +5,18 @@ use crate::types::{CommandType, ErrorCode, MTSubsystem, RPCCommandId};
 use num_traits::FromPrimitive;
 use std::io::Cursor;
 
-pub fn try_decode(header: &MTHeader, cursor: &mut Cursor<&[u8]>) -> Result<MTFramePayload, Error> {
+pub fn try_decode(cmd_type: &CommandType, id: u8, buffer: &[u8]) -> Result<MTFramePayload, Error> {
     use MTFramePayload::*;
 
-    let command_id =
-        FromPrimitive::from_u8(header.command.id).ok_or(Error::InvalidStatus(header.command.id))?;
+    let id = FromPrimitive::from_u8(id).ok_or(Error::InvalidCommandId(id))?;
 
-    match header.command.cmd_type {
+    match cmd_type {
         CommandType::POLL => Err(Error::NotImplemented),
         CommandType::SREQ => Err(Error::NotImplemented),
         CommandType::AREQ => Err(Error::NotImplemented),
-        CommandType::SRSP => match command_id {
+        CommandType::SRSP => match id {
             RPCCommandId::MTCommandError => {
-                MTCommandError::try_decode(cursor).map(|x| RPC_MTCommandError(x))
+                MTCommandError::try_decode(buffer).map(|x| RPC_MTCommandError(x))
             }
         },
     }
@@ -30,9 +29,10 @@ pub struct MTCommandError {
 }
 
 impl MTCommandError {
-    pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
-        let error_code = ErrorCode::try_decode(cursor)?;
-        let command = CommandCode::try_decode(cursor)?;
+    pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
+        let mut cursor = Cursor::new(buffer);
+        let error_code = ErrorCode::try_decode(&mut cursor)?;
+        let command = CommandCode::try_decode(&mut cursor)?;
         Ok(MTCommandError {
             error_code,
             command,
