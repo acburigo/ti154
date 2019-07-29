@@ -197,6 +197,14 @@ impl Status {
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(*self as u8);
     }
+
+    pub fn to_result(self) -> Result<(), Status> {
+        if self == Status::Success {
+            Ok(())
+        } else {
+            Err(self)
+        }
+    }
 }
 
 #[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
