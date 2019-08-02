@@ -334,7 +334,7 @@ pub struct DisassociateReq {
     pub device_address: Address,
     pub device_pan_id: u16,
     pub disassociate_reason: DisassociateReason,
-    pub tx_indirect: u8,
+    pub tx_indirect: bool,
     pub key_source: KeySource,
     pub security_level: SecurityLevel,
     pub key_id_mode: KeyIdMode,
@@ -347,7 +347,7 @@ impl DisassociateReq {
         let device_address = Address::try_decode(&mut cursor)?;
         let device_pan_id = cursor.get_u16_le();
         let disassociate_reason = DisassociateReason::try_decode(&mut cursor)?;
-        let tx_indirect = cursor.get_u8();
+        let tx_indirect = cursor.get_u8() == 0;
         let key_source = KeySource::try_decode(&mut cursor)?;
         let security_level = SecurityLevel::try_decode(&mut cursor)?;
         let key_id_mode = KeyIdMode::try_decode(&mut cursor)?;
@@ -374,7 +374,7 @@ impl DisassociateReq {
         self.device_address.encode_into(buffer);
         buffer.put_u16_le(self.device_pan_id);
         self.disassociate_reason.encode_into(buffer);
-        buffer.put_u8(self.tx_indirect);
+        buffer.put_u8(if self.tx_indirect { 1 } else { 0 });
         self.key_source.encode_into(buffer);
         self.security_level.encode_into(buffer);
         self.key_id_mode.encode_into(buffer);
