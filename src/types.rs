@@ -224,7 +224,7 @@ impl AddressMode {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub struct ShortAddress {
     pub address: u16,
 }
@@ -241,7 +241,7 @@ impl ShortAddress {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub struct ExtendedAddress {
     pub address: [u8; 8],
 }
@@ -261,7 +261,7 @@ impl ExtendedAddress {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub enum Address {
     Addr16Bit(ShortAddress),
     Addr64Bit(ExtendedAddress),
@@ -383,7 +383,7 @@ impl KeyIdMode {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub struct KeySource {
     pub key: [u8; 8],
 }
@@ -841,7 +841,7 @@ impl ExtendedAddressType {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub struct ChannelsBitMap {
     pub channels: [u8; 17],
 }
