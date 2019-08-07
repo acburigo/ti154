@@ -8,6 +8,7 @@ description = "Library for creating and parsing TI 15.4 UART packets."
 repository = "https://github.com/acburigo/ti154"
 
 [dependencies]
+bitflags = "1.1.0"
 bytes = "0.4.12"
 num-traits = "0.2"
 num-derive = "0.2"

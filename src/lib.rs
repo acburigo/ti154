@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate bitflags;
+
 pub mod error;
 pub mod frame;
 pub mod parser;

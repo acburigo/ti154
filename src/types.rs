@@ -297,47 +297,48 @@ impl Address {
     }
 }
 
-#[derive(Debug, FromPrimitive, PartialEq, Copy, Clone)]
-pub enum TxOption {
-    // Non-acknowledged transmission.
-    NoAck = 0x00,
+bitflags! {
+    pub struct TxOption: u8 {
+        // Non-acknowledged transmission.
+        const NOACK = 0x00;
 
-    // Acknowledged transmission.
-    // The MAC will attempt to retransmit the frame until it is acknowledged.
-    Ack = 0x01,
+        // Acknowledged transmission.
+        // The MAC will attempt to retransmit the frame until it is acknowledged.
+        const ACK = 0x01;
 
-    // GTS transmission (unused)
-    GTS = 0x02,
+        // GTS transmission (unused)
+        const GTS = 0x02;
 
-    // Indirect transmission.
-    // The MAC will queue the data and wait for the destination device to poll for it.
-    // This can only be used by a coordinator device.
-    Indirect = 0x04,
+        // Indirect transmission.
+        // The MAC will queue the data and wait for the destination device to poll for it.
+        // This can only be used by a coordinator device.
+        const INDIRECT = 0x04;
 
-    // Force setting of pending bit for direct transmission.
-    PendBit = 0x08,
+        // Force setting of pending bit for direct transmission.
+        const PEND_BIT = 0x08;
 
-    // This proprietary option prevents the frame from being retransmitted.
-    NoRetrans = 0x10,
+        // This proprietary option prevents the frame from being retransmitted.
+        const NO_RETRANS = 0x10;
 
-    // This proprietary option prevents a MAC_DATA_CNF event from being sent for this frame.
-    NoCNF = 0x20,
+        // This proprietary option prevents a MAC_DATA_CNF event from being sent for this frame.
+        const NO_CNF = 0x20;
 
-    // Use PIB value MAC_ALT_BE for the minimum backoff exponent.
-    AltBE = 0x40,
+        // Use PIB value MAC_ALT_BE for the minimum backoff exponent.
+        const ALT_BE = 0x40;
 
-    // Use the power and channel values in macDataReq_t instead of the PIB values.
-    PwrChan = 0x80,
+        // Use the power and channel values in macDataReq_t instead of the PIB values.
+        const PWR_CHAN = 0x80;
+    }
 }
 
 impl TxOption {
     pub fn try_decode(cursor: &mut Cursor<&[u8]>) -> Result<Self, Error> {
         let value = cursor.get_u8();
-        FromPrimitive::from_u8(value).ok_or(Error::InvalidTxOption(value))
+        TxOption::from_bits(value).ok_or(Error::InvalidTxOption(value))
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
-        buffer.put_u8(*self as u8);
+        buffer.put_u8(self.bits);
     }
 }
 
