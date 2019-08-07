@@ -288,6 +288,7 @@ impl Address {
             Address::Addr16Bit(address) => {
                 buffer.put_u8(AddressMode::Addr16Bit as u8);
                 address.encode_into(buffer);
+                buffer.extend_from_slice(&[0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
             }
             Address::Addr64Bit(address) => {
                 buffer.put_u8(AddressMode::Addr64Bit as u8);
