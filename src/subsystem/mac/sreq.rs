@@ -491,16 +491,16 @@ impl SetReq {
 #[derive(Debug)]
 pub struct SecurityGetReq {
     pub attribute_id: SecurityPIBAttributeId,
-    pub index1: u8,
-    pub index2: u8,
+    pub index1: u16,
+    pub index2: u16,
 }
 
 impl SecurityGetReq {
     pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
         let mut cursor = Cursor::new(buffer);
         let attribute_id = SecurityPIBAttributeId::try_decode(&mut cursor)?;
-        let index1 = cursor.get_u8();
-        let index2 = cursor.get_u8();
+        let index1 = cursor.get_u16_le();
+        let index2 = cursor.get_u16_le();
 
         Ok(SecurityGetReq {
             attribute_id,
@@ -517,14 +517,14 @@ impl SecurityGetReq {
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.attribute_id.encode_into(buffer);
-        buffer.put_u8(self.index1);
-        buffer.put_u8(self.index2);
+        buffer.put_u16_le(self.index1);
+        buffer.put_u16_le(self.index2);
     }
 
     pub fn into_mt_frame(self) -> MTFrame {
         MTFrame {
             header: MTHeader {
-                length: 0x03,
+                length: 0x05,
                 command: CommandCode {
                     is_extended: false,
                     cmd_type: CommandType::SREQ,
@@ -541,8 +541,8 @@ impl SecurityGetReq {
 #[derive(Debug)]
 pub struct SecuritySetReq {
     pub attribute_id: SecurityPIBAttributeId,
-    pub index1: u8,
-    pub index2: u8,
+    pub index1: u16,
+    pub index2: u16,
     pub attribute_value: Vec<u8>,
 }
 
@@ -550,8 +550,8 @@ impl SecuritySetReq {
     pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
         let mut cursor = Cursor::new(buffer);
         let attribute_id = SecurityPIBAttributeId::try_decode(&mut cursor)?;
-        let index1 = cursor.get_u8();
-        let index2 = cursor.get_u8();
+        let index1 = cursor.get_u16_le();
+        let index2 = cursor.get_u16_le();
 
         let mut attribute_value = Vec::new();
         cursor
@@ -574,15 +574,15 @@ impl SecuritySetReq {
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.attribute_id.encode_into(buffer);
-        buffer.put_u8(self.index1);
-        buffer.put_u8(self.index2);
+        buffer.put_u16_le(self.index1);
+        buffer.put_u16_le(self.index2);
         buffer.extend(self.attribute_value.iter());
     }
 
     pub fn into_mt_frame(self) -> MTFrame {
         MTFrame {
             header: MTHeader {
-                length: 0x01 + self.attribute_value.len() as u8,
+                length: 0x05 + self.attribute_value.len() as u8,
                 command: CommandCode {
                     is_extended: false,
                     cmd_type: CommandType::SREQ,
@@ -923,7 +923,7 @@ impl WriteKeyReq {
     pub fn into_mt_frame(self) -> MTFrame {
         MTFrame {
             header: MTHeader {
-                length: 0x20,
+                length: 0x21,
                 command: CommandCode {
                     is_extended: false,
                     cmd_type: CommandType::SREQ,
