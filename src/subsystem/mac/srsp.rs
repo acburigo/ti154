@@ -329,8 +329,8 @@ impl SetReq {
 #[derive(Debug)]
 pub struct SecurityGetReq {
     pub status: Status,
-    pub index1: u8,
-    pub index2: u8,
+    pub index1: u16,
+    pub index2: u16,
     pub data: Vec<u8>,
 }
 
@@ -338,8 +338,8 @@ impl SecurityGetReq {
     pub fn try_decode(buffer: &[u8]) -> Result<Self, Error> {
         let mut cursor = Cursor::new(buffer);
         let status = Status::try_decode(&mut cursor)?;
-        let index1 = cursor.get_u8();
-        let index2 = cursor.get_u8();
+        let index1 = cursor.get_u16_le();
+        let index2 = cursor.get_u16_le();
 
         let mut data = Vec::new();
         cursor
@@ -362,15 +362,15 @@ impl SecurityGetReq {
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         self.status.encode_into(buffer);
-        buffer.put_u8(self.index1);
-        buffer.put_u8(self.index2);
+        buffer.put_u16_le(self.index1);
+        buffer.put_u16_le(self.index2);
         buffer.extend(self.data.iter());
     }
 
     pub fn into_mt_frame(self) -> MTFrame {
         MTFrame {
             header: MTHeader {
-                length: 0x03 + self.data.len() as u8,
+                length: 0x05 + self.data.len() as u8,
                 command: CommandCode {
                     is_extended: false,
                     cmd_type: CommandType::SRSP,
