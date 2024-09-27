@@ -396,12 +396,11 @@ impl KeySource {
         cursor
             .read_exact(&mut key)
             .map_err(|_| Error::NotEnoughBytes)?;
-        key.reverse();
         Ok(KeySource { key })
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
-        buffer.extend(self.key.iter().rev());
+        buffer.extend(self.key.iter());
     }
 }
 
