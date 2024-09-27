@@ -664,7 +664,6 @@ impl AddDeviceReq {
         cursor
             .read_exact(&mut lookup_data)
             .map_err(|_| Error::NotEnoughBytes)?;
-        lookup_data.reverse();
 
         Ok(AddDeviceReq {
             pan_id,
@@ -694,7 +693,7 @@ impl AddDeviceReq {
         buffer.put_u8(if self.unique { 1 } else { 0 });
         buffer.put_u8(if self.duplicate { 1 } else { 0 });
         buffer.put_u8(self.data_size);
-        buffer.extend(self.lookup_data.iter().rev());
+        buffer.extend(self.lookup_data.iter());
     }
 
     pub fn into_mt_frame(self) -> MTFrame {
