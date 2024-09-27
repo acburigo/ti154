@@ -884,7 +884,6 @@ impl WriteKeyReq {
         cursor
             .read_exact(&mut key)
             .map_err(|_| Error::NotEnoughBytes)?;
-        key.reverse();
 
         let frame_counter = cursor.get_u32_le();
         let data_size = cursor.get_u8();
@@ -893,7 +892,6 @@ impl WriteKeyReq {
         cursor
             .read_exact(&mut lookup_data)
             .map_err(|_| Error::NotEnoughBytes)?;
-        lookup_data.reverse();
 
         Ok(WriteKeyReq {
             new,
@@ -914,10 +912,10 @@ impl WriteKeyReq {
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
         buffer.put_u8(if self.new { 1 } else { 0 });
         buffer.put_u16_le(self.index);
-        buffer.extend(self.key.iter().rev());
+        buffer.extend(self.key.iter());
         buffer.put_u32_le(self.frame_counter);
         buffer.put_u8(self.data_size);
-        buffer.extend(self.lookup_data.iter().rev());
+        buffer.extend(self.lookup_data.iter());
     }
 
     pub fn into_mt_frame(self) -> MTFrame {
