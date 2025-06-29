@@ -299,6 +299,7 @@ impl Address {
 }
 
 bitflags! {
+    #[derive(Debug)]
     pub struct TxOption: u8 {
         // Non-acknowledged transmission.
         const NOACK = 0x00;
@@ -339,7 +340,7 @@ impl TxOption {
     }
 
     pub fn encode_into(&self, buffer: &mut Vec<u8>) {
-        buffer.put_u8(self.bits);
+        buffer.put_u8(self.bits());
     }
 }
 
