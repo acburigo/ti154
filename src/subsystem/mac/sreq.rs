@@ -5,7 +5,7 @@ use bytes::{Buf, BufMut};
 use std::io::Cursor;
 use std::io::Read;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Init {}
 
 impl Init {
@@ -38,7 +38,7 @@ impl Init {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DataReq {
     pub dest_address: Address,
     pub dest_pan_id: u16,
@@ -148,7 +148,7 @@ impl DataReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PurgeReq {
     pub handle: u8,
 }
@@ -187,7 +187,7 @@ impl PurgeReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AssociateReq {
     pub logical_channel: u8,
     pub channel_page: u8,
@@ -264,7 +264,7 @@ impl AssociateReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AssociateRsp {
     pub extended_address: ExtendedAddress,
     pub assoc_short_address: ShortAddress,
@@ -329,7 +329,7 @@ impl AssociateRsp {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DisassociateReq {
     pub device_address: Address,
     pub device_pan_id: u16,
@@ -398,7 +398,7 @@ impl DisassociateReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct GetReq {
     pub attribute_id: MACPIBAttributeId,
 }
@@ -437,7 +437,7 @@ impl GetReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SetReq {
     pub attribute_id: MACPIBAttributeId,
     pub attribute_value: [u8; 16],
@@ -488,7 +488,7 @@ impl SetReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SecurityGetReq {
     pub attribute_id: SecurityPIBAttributeId,
     pub index1: u16,
@@ -538,7 +538,7 @@ impl SecurityGetReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SecuritySetReq {
     pub attribute_id: SecurityPIBAttributeId,
     pub index1: u16,
@@ -596,7 +596,7 @@ impl SecuritySetReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct UpdatePANIdReq {
     pub pan_id: u16,
 }
@@ -635,7 +635,7 @@ impl UpdatePANIdReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AddDeviceReq {
     pub pan_id: u16,
     pub short_addr: ShortAddress,
@@ -713,7 +713,7 @@ impl AddDeviceReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DeleteDeviceReq {
     pub ext_addr: ExtendedAddress,
 }
@@ -752,7 +752,7 @@ impl DeleteDeviceReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DeleteAllDevicesReq {}
 
 impl DeleteAllDevicesReq {
@@ -785,7 +785,7 @@ impl DeleteAllDevicesReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DeleteKeyReq {
     pub index: u8,
 }
@@ -824,7 +824,7 @@ impl DeleteKeyReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ReadKeyReq {
     pub index: u8,
 }
@@ -863,7 +863,7 @@ impl ReadKeyReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct WriteKeyReq {
     pub new: bool,
     pub index: u16,
@@ -934,7 +934,7 @@ impl WriteKeyReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct OrphanRsp {
     pub extended_address: ExtendedAddress,
     pub assoc_short_address: ShortAddress,
@@ -999,7 +999,7 @@ impl OrphanRsp {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PollReq {
     pub coord_address: Address,
     pub coord_pan_id: u16,
@@ -1060,7 +1060,7 @@ impl PollReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ResetReq {
     pub set_default: bool,
 }
@@ -1099,7 +1099,7 @@ impl ResetReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ScanReq {
     pub scan_type: ScanType,
     pub scan_duration: u8,
@@ -1200,7 +1200,7 @@ impl ScanReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct StartReq {
     pub start_time: u32,
     pub pan_id: u16,
@@ -1338,7 +1338,7 @@ impl StartReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SyncReq {
     pub logical_channel: u8,
     pub channel_page: u8,
@@ -1391,7 +1391,7 @@ impl SyncReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SetRxGainReq {
     pub mode: bool,
 }
@@ -1430,7 +1430,7 @@ impl SetRxGainReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct WSAsyncReq {
     pub operation: WiSUNAsyncOperation,
     pub frame_type: WiSUNAsyncFrameType,
@@ -1495,7 +1495,7 @@ impl WSAsyncReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FHEnableReq {}
 
 impl FHEnableReq {
@@ -1528,7 +1528,7 @@ impl FHEnableReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FHStartReq {}
 
 impl FHStartReq {
@@ -1561,7 +1561,7 @@ impl FHStartReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FHGetReq {
     pub attribute_id: FHPIBAttributeId,
 }
@@ -1600,7 +1600,7 @@ impl FHGetReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FHSetReq {
     pub attribute_id: FHPIBAttributeId,
     pub data: Vec<u8>,

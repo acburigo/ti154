@@ -299,7 +299,7 @@ impl Address {
 }
 
 bitflags! {
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     pub struct TxOption: u8 {
         // Non-acknowledged transmission.
         const NOACK = 0x00;

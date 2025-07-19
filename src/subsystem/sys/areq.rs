@@ -4,7 +4,7 @@ use crate::types::*;
 use bytes::{Buf, BufMut};
 use std::io::Cursor;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ResetReq {
     pub reset_type: ResetType,
 }
@@ -43,7 +43,7 @@ impl ResetReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ResetInd {
     pub reason: ResetReason,
     pub transport: TransportProtocolRevision,

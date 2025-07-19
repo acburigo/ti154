@@ -22,7 +22,7 @@ pub fn try_decode(cmd_type: &CommandType, id: u8, buffer: &[u8]) -> Result<MTFra
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MTCommandError {
     pub error_code: ErrorCode,
     pub command: CommandCode,

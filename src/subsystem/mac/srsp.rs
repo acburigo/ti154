@@ -5,7 +5,7 @@ use bytes::{Buf, BufMut};
 use std::io::Cursor;
 use std::io::Read;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Init {
     pub status: Status,
 }
@@ -44,7 +44,7 @@ impl Init {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DataReq {
     pub status: Status,
 }
@@ -83,7 +83,7 @@ impl DataReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PurgeReq {
     pub status: Status,
 }
@@ -122,7 +122,7 @@ impl PurgeReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AssociateReq {
     pub status: Status,
 }
@@ -161,7 +161,7 @@ impl AssociateReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AssociateRsp {
     pub status: Status,
 }
@@ -200,7 +200,7 @@ impl AssociateRsp {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DisassociateReq {
     pub status: Status,
 }
@@ -239,7 +239,7 @@ impl DisassociateReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct GetReq {
     pub status: Status,
     pub data: [u8; 16],
@@ -287,7 +287,7 @@ impl GetReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SetReq {
     pub status: Status,
 }
@@ -326,7 +326,7 @@ impl SetReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SecurityGetReq {
     pub status: Status,
     pub index1: u16,
@@ -384,7 +384,7 @@ impl SecurityGetReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SecuritySetReq {
     pub status: Status,
 }
@@ -423,7 +423,7 @@ impl SecuritySetReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct UpdatePANIdReq {
     pub status: Status,
 }
@@ -462,7 +462,7 @@ impl UpdatePANIdReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AddDeviceReq {
     pub status: Status,
 }
@@ -501,7 +501,7 @@ impl AddDeviceReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DeleteDeviceReq {
     pub status: Status,
 }
@@ -540,7 +540,7 @@ impl DeleteDeviceReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DeleteAllDevicesReq {
     pub status: Status,
 }
@@ -579,7 +579,7 @@ impl DeleteAllDevicesReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DeleteKeyReq {
     pub status: Status,
 }
@@ -618,7 +618,7 @@ impl DeleteKeyReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ReadKeyReq {
     pub status: Status,
     pub frame_counter: u32,
@@ -663,7 +663,7 @@ impl ReadKeyReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct WriteKeyReq {
     pub status: Status,
 }
@@ -702,7 +702,7 @@ impl WriteKeyReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct OrphanRsp {
     pub status: Status,
 }
@@ -741,7 +741,7 @@ impl OrphanRsp {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PollReq {
     pub status: Status,
 }
@@ -780,7 +780,7 @@ impl PollReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ResetReq {
     pub status: Status,
 }
@@ -819,7 +819,7 @@ impl ResetReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ScanReq {
     pub status: Status,
 }
@@ -858,7 +858,7 @@ impl ScanReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct StartReq {
     pub status: Status,
 }
@@ -897,7 +897,7 @@ impl StartReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SyncReq {
     pub status: Status,
 }
@@ -936,7 +936,7 @@ impl SyncReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SetRxGainReq {
     pub status: Status,
 }
@@ -975,7 +975,7 @@ impl SetRxGainReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct WSAsyncReq {
     pub status: Status,
 }
@@ -1014,7 +1014,7 @@ impl WSAsyncReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FHEnableReq {
     pub status: Status,
 }
@@ -1053,7 +1053,7 @@ impl FHEnableReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FHStartReq {
     pub status: Status,
 }
@@ -1092,7 +1092,7 @@ impl FHStartReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FHGetReq {
     pub status: Status,
     pub data: Vec<u8>,
@@ -1139,7 +1139,7 @@ impl FHGetReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FHSetReq {
     pub status: Status,
 }

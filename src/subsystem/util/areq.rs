@@ -5,7 +5,7 @@ use bytes::{Buf, BufMut};
 use std::io::Cursor;
 use std::io::Read;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Loopback {
     pub repeats: u8,
     pub interval: u32,
