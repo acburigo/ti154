@@ -5,7 +5,7 @@ use bytes::{Buf, BufMut};
 use std::io::Cursor;
 use std::io::Read;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PingReq {
     pub capabilities: u16,
 }
@@ -44,7 +44,7 @@ impl PingReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct VersionReq {
     pub transport: TransportProtocolRevision,
     pub product: ProductIdCode,
@@ -101,7 +101,7 @@ impl VersionReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NVCreateReq {
     pub status: Status,
 }
@@ -140,7 +140,7 @@ impl NVCreateReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NVDeleteReq {
     pub status: Status,
 }
@@ -179,7 +179,7 @@ impl NVDeleteReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NVLengthReq {
     pub length: u32,
 }
@@ -218,7 +218,7 @@ impl NVLengthReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NVReadReq {
     pub status: Status,
     pub length: u8,
@@ -272,7 +272,7 @@ impl NVReadReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NVWriteReq {
     pub status: Status,
 }
@@ -311,7 +311,7 @@ impl NVWriteReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NVUpdateReq {
     pub status: Status,
 }
@@ -350,7 +350,7 @@ impl NVUpdateReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NVCompactReq {
     pub status: Status,
 }

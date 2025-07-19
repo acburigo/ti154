@@ -5,7 +5,7 @@ use bytes::{Buf, BufMut};
 use std::io::Cursor;
 use std::io::Read;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DataCnf {
     pub status: Status,
     pub handle: u8,
@@ -79,7 +79,7 @@ impl DataCnf {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DataInd {
     pub src_address: Address,
     pub dest_address: Address,
@@ -201,7 +201,7 @@ impl DataInd {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PurgeCnf {
     pub status: Status,
     pub handle: u8,
@@ -243,7 +243,7 @@ impl PurgeCnf {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct WSAsyncInd {
     pub src_address: Address,
     pub dest_address: Address,
@@ -369,7 +369,7 @@ impl WSAsyncInd {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SyncLossInd {
     pub status: Status,
     pub pan_id: u16,
@@ -443,7 +443,7 @@ impl SyncLossInd {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AssociateInd {
     pub extended_address: ExtendedAddress,
     pub capabilities: u8,
@@ -505,7 +505,7 @@ impl AssociateInd {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AssociateCnf {
     pub status: Status,
     pub short_address: ShortAddress,
@@ -567,7 +567,7 @@ impl AssociateCnf {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum BeaconNotifyInd {
     StandardFrame(StandardBeaconFrame),
     EnhancedFrame(EnhancedBeaconFrame),
@@ -633,7 +633,7 @@ impl BeaconNotifyInd {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct StandardBeaconFrame {
     pub bsn: u8,
     pub timestamp: u32,
@@ -757,7 +757,7 @@ impl StandardBeaconFrame {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct EnhancedBeaconFrame {
     pub bsn: u8,
     pub beacon_order: u8,
@@ -809,7 +809,7 @@ impl EnhancedBeaconFrame {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DisassociateInd {
     pub extended_address: ExtendedAddress,
     pub disassociate_reason: DisassociateReason,
@@ -871,7 +871,7 @@ impl DisassociateInd {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DisassociateCnf {
     pub status: Status,
     pub device_addr: Address,
@@ -921,7 +921,7 @@ impl DisassociateCnf {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct OrphanInd {
     pub extended_address: ExtendedAddress,
     pub key_source: KeySource,
@@ -978,7 +978,7 @@ impl OrphanInd {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PollCnf {
     pub status: Status,
     pub frame_pending: bool,
@@ -1023,7 +1023,7 @@ impl PollCnf {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PollInd {
     pub dev_addr: Address,
     pub pan_id: u16,
@@ -1072,7 +1072,7 @@ impl PollInd {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ScanCnf {
     pub status: Status,
     pub scan_type: ScanType,
@@ -1142,7 +1142,7 @@ impl ScanCnf {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CommStatusInd {
     pub status: Status,
     pub src_addr: Address,
@@ -1216,7 +1216,7 @@ impl CommStatusInd {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct StartCnf {
     pub status: Status,
 }
@@ -1255,7 +1255,7 @@ impl StartCnf {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct WSAsyncCnf {
     pub status: Status,
 }

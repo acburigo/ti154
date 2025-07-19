@@ -5,7 +5,7 @@ use bytes::{Buf, BufMut};
 use std::io::Cursor;
 use std::io::Read;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CallbackSubCmd {
     pub subsystem_id: SubsystemId,
     pub enables: u32,
@@ -50,7 +50,7 @@ impl CallbackSubCmd {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct GetExtAddr {
     pub address_type: ExtendedAddressType,
 }
@@ -89,7 +89,7 @@ impl GetExtAddr {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Loopback {
     pub repeats: u8,
     pub interval: u32,
@@ -143,7 +143,7 @@ impl Loopback {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Random {}
 
 impl Random {

@@ -5,7 +5,7 @@ use bytes::{Buf, BufMut};
 use std::io::Cursor;
 use std::io::Read;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PingReq {}
 
 impl PingReq {
@@ -38,7 +38,7 @@ impl PingReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct VersionReq {}
 
 impl VersionReq {
@@ -71,7 +71,7 @@ impl VersionReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NVCreateReq {
     pub sys_id: u8,
     pub item_id: u16,
@@ -124,7 +124,7 @@ impl NVCreateReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NVDeleteReq {
     pub sys_id: u8,
     pub item_id: u16,
@@ -173,7 +173,7 @@ impl NVDeleteReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NVLengthReq {
     pub sys_id: u8,
     pub item_id: u16,
@@ -222,7 +222,7 @@ impl NVLengthReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NVReadReq {
     pub sys_id: u8,
     pub item_id: u16,
@@ -279,7 +279,7 @@ impl NVReadReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NVWriteReq {
     pub sys_id: u8,
     pub item_id: u16,
@@ -345,7 +345,7 @@ impl NVWriteReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NVUpdateReq {
     pub sys_id: u8,
     pub item_id: u16,
@@ -407,7 +407,7 @@ impl NVUpdateReq {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NVCompactReq {
     pub threshold: u16,
 }
